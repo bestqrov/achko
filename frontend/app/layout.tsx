@@ -5,6 +5,11 @@ import Providers from '@/lib/providers';
 export const metadata: Metadata = {
   title: 'ArwaPark - Fleet Management SaaS',
   description: 'Production-ready fleet and transport management platform',
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

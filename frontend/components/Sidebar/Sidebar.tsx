@@ -12,15 +12,17 @@ import {
   DollarSign, Shield, Car, CheckCircle, Receipt, Award,
   Key, FileCheck, Globe, BookOpen, Flame, AlertTriangle,
   Briefcase, Users, Users2, UserX, Umbrella, GraduationCap, HeartPulse, Stamp, BookMarked,
-  Menu, Building2, UserCog, Palette, HardDrive,
+  Menu, Building2, UserCog, Palette, HardDrive, Lock, Zap, Crown,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth/authStore';
 import { useRouter } from 'next/navigation';
+import { currentPack, isLocked, PACKS } from '@/lib/pack';
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ElementType;
+  alwaysUnlocked?: boolean;
 }
 
 interface NavSection {
@@ -107,6 +109,7 @@ const NAV: NavSection[] = [
     items: [
       { label: 'Profil projet',  href: '/dashboard/parametres/profil-projet', icon: Building2 },
       { label: 'Utilisateurs',   href: '/dashboard/parametres/utilisateurs',  icon: UserCog },
+      { label: 'Pack',           href: '/dashboard/parametres/pack',          icon: Crown, alwaysUnlocked: true },
       { label: 'Thème',          href: '/dashboard/parametres/theme',         icon: Palette },
       { label: 'Sauvegarde',     href: '/dashboard/parametres/sauvegarde',    icon: HardDrive },
     ],
@@ -204,23 +207,37 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
               {!collapsed[section] && (
                 <ul className="space-y-0.5">
-                  {(expanded[section] ? items : items.slice(0, PREVIEW)).map(({ label, href, icon: Icon }) => {
+                  {(expanded[section] ? items : items.slice(0, PREVIEW)).map(({ label, href, icon: Icon, alwaysUnlocked }) => {
                     const active = pathname === href || pathname.startsWith(href + '/');
+                    const locked = !alwaysUnlocked && isLocked(href);
                     return (
                       <li key={href}>
-                        <Link
-                          href={href}
-                          onClick={() => window.innerWidth < 1024 && onClose()}
-                          className={cn(
-                            'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
-                            active
-                              ? 'bg-primary-600 text-white shadow-md'
-                              : 'text-white/60 hover:bg-sidebar-hover hover:text-white'
-                          )}
-                        >
-                          <Icon className="w-4 h-4 flex-shrink-0" />
-                          <span className="truncate">{label}</span>
-                        </Link>
+                        {locked ? (
+                          <Link
+                            href="/dashboard/parametres/pack"
+                            onClick={() => window.innerWidth < 1024 && onClose()}
+                            className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150 text-white/30 hover:text-white/50 hover:bg-white/5 group"
+                            title={`Disponible en pack Pro — cliquez pour upgrader`}
+                          >
+                            <Icon className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate flex-1">{label}</span>
+                            <Lock className="w-3 h-3 flex-shrink-0 text-amber-400/70 group-hover:text-amber-400" />
+                          </Link>
+                        ) : (
+                          <Link
+                            href={href}
+                            onClick={() => window.innerWidth < 1024 && onClose()}
+                            className={cn(
+                              'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
+                              active
+                                ? 'bg-primary-600 text-white shadow-md'
+                                : 'text-white/60 hover:bg-sidebar-hover hover:text-white'
+                            )}
+                          >
+                            <Icon className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">{label}</span>
+                          </Link>
+                        )}
                       </li>
                     );
                   })}
@@ -251,6 +268,23 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </div>
           ))}
         </nav>
+
+        {/* Upgrade banner */}
+        <div className="px-3 py-3 border-t border-white/10">
+          <Link
+            href="/dashboard/parametres/pack"
+            className="flex items-center gap-2 w-full bg-gradient-to-r from-amber-500/20 to-amber-600/10 hover:from-amber-500/30 hover:to-amber-600/20 border border-amber-500/30 hover:border-amber-500/50 rounded-xl px-3 py-2.5 transition-all group"
+          >
+            <div className="w-7 h-7 rounded-lg bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+              <Crown className="w-3.5 h-3.5 text-amber-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-bold text-amber-400 leading-tight">Pack {currentPack.label}</p>
+              <p className="text-[10px] text-white/40 group-hover:text-white/60 transition-colors leading-tight truncate">Passer en Pro →</p>
+            </div>
+            <Zap className="w-3.5 h-3.5 text-amber-400/60 group-hover:text-amber-400 flex-shrink-0 transition-colors" />
+          </Link>
+        </div>
 
         {/* Footer */}
         <div className="border-t border-white/10 p-4">
