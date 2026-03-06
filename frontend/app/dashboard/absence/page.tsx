@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import {
-  Plus, ArrowLeft, User, Calendar, Hash,
-  Tag, Paperclip, MessageSquare, UserX,
+  Plus, ArrowLeft, User, Calendar,
+  Tag, Paperclip, MessageSquare, UserX, Type, Clock, CheckSquare,
 } from 'lucide-react';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
@@ -13,11 +13,12 @@ import { formatDate } from '@/lib/utils/helpers';
 const EMPTY_FORM = {
   type: 'absence',
   collaborateur: '',
-  matricule: '',
-  typeAbsence: '',
+  libelle: '',
   dateDebut: '',
+  typeAbsence: '',
   dateFin: '',
-  motif: '',
+  justifiee: '',
+  dureeJours: '',
   attachement: '',
   commentaire: '',
 };
@@ -25,10 +26,12 @@ const EMPTY_FORM = {
 type Col = { key: string; label: string; render?: (v: any) => React.ReactNode };
 const LIST_COLUMNS: Col[] = [
   { key: 'collaborateur', label: 'Collaborateur' },
+  { key: 'libelle',       label: 'Libellé' },
   { key: 'typeAbsence',   label: 'Type' },
   { key: 'dateDebut',     label: 'Du',  render: (v: string) => formatDate(v) },
   { key: 'dateFin',       label: 'Au',  render: (v: string) => formatDate(v) },
-  { key: 'motif',         label: 'Motif' },
+  { key: 'dureeJours',    label: 'Durée (j)' },
+  { key: 'justifiee',     label: 'Justifiée' },
 ];
 
 function IconLabel({ icon: Icon, color, children }: { icon: React.ElementType; color: string; children: React.ReactNode }) {
@@ -100,63 +103,86 @@ export default function AbsencePage() {
         </div>
       </div>
 
+      {/* Collaborateur */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <p className="text-xs font-semibold text-orange-700 uppercase tracking-wider mb-4">Collaborateur</p>
+        <div>
+          <IconLabel icon={User} color="#c2410c">Collaborateur *</IconLabel>
+          <input type="text" name="collaborateur" value={form.collaborateur} onChange={handleChange}
+            placeholder="Nom du collaborateur"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50" />
+        </div>
+      </div>
+
+      {/* Informations générales */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
         <p className="text-xs font-semibold text-orange-700 uppercase tracking-wider">Informations générales</p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Libellé | Date début | Type absence */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div>
-            <IconLabel icon={User} color="#c2410c">Collaborateur *</IconLabel>
-            <input type="text" name="collaborateur" value={form.collaborateur} onChange={handleChange} placeholder="Nom du collaborateur"
+            <IconLabel icon={Type} color="#c2410c">Libellé</IconLabel>
+            <input type="text" name="libelle" value={form.libelle} onChange={handleChange}
+              placeholder="Libellé de l'absence"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50" />
           </div>
-          <div>
-            <IconLabel icon={Hash} color="#7c3aed">Matricule</IconLabel>
-            <input type="text" name="matricule" value={form.matricule} onChange={handleChange} placeholder="Matricule"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50" />
-          </div>
-        </div>
-
-        <div>
-          <IconLabel icon={Tag} color="#d97706">Type d'absence</IconLabel>
-          <select name="typeAbsence" value={form.typeAbsence} onChange={handleChange}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50">
-            <option value="">— Sélectionner —</option>
-            <option value="maladie">Maladie</option>
-            <option value="injustifiée">Injustifiée</option>
-            <option value="accident">Accident de travail</option>
-            <option value="familiale">Événement familial</option>
-            <option value="autre">Autre</option>
-          </select>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <IconLabel icon={Calendar} color="#16a34a">Date début</IconLabel>
             <input type="date" name="dateDebut" value={form.dateDebut} onChange={handleChange}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50" />
           </div>
           <div>
+            <IconLabel icon={Tag} color="#d97706">Type absence *</IconLabel>
+            <select name="typeAbsence" value={form.typeAbsence} onChange={handleChange}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50">
+              <option value="">— Sélectionner —</option>
+              <option value="Maladie">Maladie</option>
+              <option value="Injustifiée">Injustifiée</option>
+              <option value="Accident de travail">Accident de travail</option>
+              <option value="Événement familial">Événement familial</option>
+              <option value="Congé sans solde">Congé sans solde</option>
+              <option value="Autre">Autre</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Date fin | Justifiée | Durée */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
             <IconLabel icon={Calendar} color="#dc2626">Date fin</IconLabel>
             <input type="date" name="dateFin" value={form.dateFin} onChange={handleChange}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50" />
           </div>
+          <div>
+            <IconLabel icon={CheckSquare} color="#7c3aed">Justifiée</IconLabel>
+            <select name="justifiee" value={form.justifiee} onChange={handleChange}
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50">
+              <option value="">— Sélectionner —</option>
+              <option value="Oui">Oui</option>
+              <option value="Non">Non</option>
+            </select>
+          </div>
+          <div>
+            <IconLabel icon={Clock} color="#0891b2">Durée (Jours)</IconLabel>
+            <input type="number" name="dureeJours" value={form.dureeJours} onChange={handleChange}
+              min="0" step="0.5" placeholder="0"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50" />
+          </div>
         </div>
 
-        <div>
-          <IconLabel icon={MessageSquare} color="#64748b">Motif</IconLabel>
-          <input type="text" name="motif" value={form.motif} onChange={handleChange} placeholder="Motif de l'absence"
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50" />
-        </div>
-
+        {/* Attachement */}
         <div>
           <IconLabel icon={Paperclip} color="#7c3aed">Attachement</IconLabel>
-          <input type="text" name="attachement" value={form.attachement} onChange={handleChange} placeholder="Lien ou référence document..."
+          <input type="text" name="attachement" value={form.attachement} onChange={handleChange}
+            placeholder="Lien ou référence document..."
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50" />
         </div>
 
+        {/* Commentaire */}
         <div>
           <IconLabel icon={MessageSquare} color="#64748b">Commentaire</IconLabel>
-          <textarea name="commentaire" value={form.commentaire} onChange={handleChange} rows={3} placeholder="Commentaire libre..."
+          <textarea name="commentaire" value={form.commentaire} onChange={handleChange} rows={3}
+            placeholder="Commentaire libre..."
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 bg-gray-50 resize-none" />
         </div>
       </div>
