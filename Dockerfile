@@ -63,7 +63,8 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 # Create non-root user
 RUN addgroup -g 1001 -S arwapark && \
     adduser  -S arwapark -u 1001 -G arwapark && \
-    chown -R arwapark:arwapark /app /var/log/supervisor
+    chown -R arwapark:arwapark /app /var/log/supervisor && \
+    chmod 1777 /tmp
 
 USER arwapark
 
