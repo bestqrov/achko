@@ -149,7 +149,7 @@ export default function ContratsAchatPage() {
               </div>
             ))}
           </div>
-          <SearchFilter value={search} onChange={setSearch} placeholder="Rechercher un contrat…" />
+          <SearchFilter onSearch={setSearch} placeholder="Rechercher un contrat…" />
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-3">
               <h2 className="text-sm font-bold text-white uppercase tracking-widest">Contrats d&apos;achat</h2>
