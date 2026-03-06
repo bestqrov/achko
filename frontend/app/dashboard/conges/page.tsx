@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import {
-  Plus, ArrowLeft, User, Calendar, Hash,
-  Tag, Paperclip, MessageSquare, Umbrella,
+  Plus, ArrowLeft, User, Calendar,
+  Paperclip, MessageSquare, Umbrella, Hash,
 } from 'lucide-react';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
@@ -13,24 +13,24 @@ import { formatDate } from '@/lib/utils/helpers';
 const EMPTY_FORM = {
   type: 'conge',
   collaborateur: '',
-  matricule: '',
-  typeConge: '',
   dateDebut: '',
   dateFin: '',
+  exclureDimanches: false,
+  exclureJoursRepos: false,
+  exclureJoursFeries: false,
   nombreJours: '',
-  soldeAvant: '',
-  soldeApres: '',
   attachement: '',
   commentaire: '',
 };
 
 type Col = { key: string; label: string; render?: (v: any) => React.ReactNode };
 const LIST_COLUMNS: Col[] = [
-  { key: 'collaborateur', label: 'Collaborateur' },
-  { key: 'typeConge',     label: 'Type' },
-  { key: 'dateDebut',     label: 'Du',   render: (v: string) => formatDate(v) },
-  { key: 'dateFin',       label: 'Au',   render: (v: string) => formatDate(v) },
-  { key: 'nombreJours',   label: 'Jours' },
+  { key: 'collaborateur',       label: 'Collaborateur' },
+  { key: 'dateDebut',           label: 'Du',    render: (v: string) => formatDate(v) },
+  { key: 'dateFin',             label: 'Au',    render: (v: string) => formatDate(v) },
+  { key: 'nombreJours',         label: 'Jours' },
+  { key: 'exclureDimanches',    label: 'Dim.', render: (v: boolean) => v ? 'Oui' : 'Non' },
+  { key: 'exclureJoursFeries',  label: 'Fériés', render: (v: boolean) => v ? 'Oui' : 'Non' },
 ];
 
 function IconLabel({ icon: Icon, color, children }: { icon: React.ElementType; color: string; children: React.ReactNode }) {
@@ -51,8 +51,10 @@ export default function CongesPage() {
   const { data, isLoading } = useResource<any>('gestion', { page, search, type: 'conge' });
   const create              = useCreateResource('gestion');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const target = e.target as HTMLInputElement;
+    setForm((f) => ({ ...f, [target.name]: target.type === 'checkbox' ? target.checked : target.value }));
+  };
 
   const handleCancel = () => { setForm(EMPTY_FORM); setView('list'); };
 
@@ -102,36 +104,22 @@ export default function CongesPage() {
         </div>
       </div>
 
+      {/* Collaborateur */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <p className="text-xs font-semibold text-teal-700 uppercase tracking-wider mb-4">Collaborateur</p>
+        <div>
+          <IconLabel icon={User} color="#0d9488">Collaborateur *</IconLabel>
+          <input type="text" name="collaborateur" value={form.collaborateur} onChange={handleChange}
+            placeholder="Nom du collaborateur"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50" />
+        </div>
+      </div>
+
+      {/* Informations générales */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
         <p className="text-xs font-semibold text-teal-700 uppercase tracking-wider">Informations générales</p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <IconLabel icon={User} color="#0d9488">Collaborateur *</IconLabel>
-            <input type="text" name="collaborateur" value={form.collaborateur} onChange={handleChange} placeholder="Nom du collaborateur"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50" />
-          </div>
-          <div>
-            <IconLabel icon={Hash} color="#7c3aed">Matricule</IconLabel>
-            <input type="text" name="matricule" value={form.matricule} onChange={handleChange} placeholder="Matricule"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50" />
-          </div>
-        </div>
-
-        <div>
-          <IconLabel icon={Tag} color="#d97706">Type de congé</IconLabel>
-          <select name="typeConge" value={form.typeConge} onChange={handleChange}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50">
-            <option value="">— Sélectionner —</option>
-            <option value="annuel">Congé annuel</option>
-            <option value="maternité">Congé maternité</option>
-            <option value="paternité">Congé paternité</option>
-            <option value="maladie">Congé maladie</option>
-            <option value="sans-solde">Congé sans solde</option>
-            <option value="autre">Autre</option>
-          </select>
-        </div>
-
+        {/* Date début | Date fin */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <IconLabel icon={Calendar} color="#16a34a">Date début</IconLabel>
@@ -145,33 +133,46 @@ export default function CongesPage() {
           </div>
         </div>
 
+        {/* Exclusions */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <IconLabel icon={Hash} color="#0891b2">Nombre de jours</IconLabel>
-            <input type="number" name="nombreJours" value={form.nombreJours} onChange={handleChange} min="0" placeholder="0"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50" />
-          </div>
-          <div>
-            <IconLabel icon={Hash} color="#64748b">Solde avant</IconLabel>
-            <input type="number" name="soldeAvant" value={form.soldeAvant} onChange={handleChange} min="0" placeholder="0"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50" />
-          </div>
-          <div>
-            <IconLabel icon={Hash} color="#64748b">Solde après</IconLabel>
-            <input type="number" name="soldeApres" value={form.soldeApres} onChange={handleChange} min="0" placeholder="0"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50" />
-          </div>
+          {[
+            { name: 'exclureDimanches',   label: 'Exclure les dimanches',       checked: form.exclureDimanches },
+            { name: 'exclureJoursRepos',  label: 'Exclure les jours de repos',  checked: form.exclureJoursRepos },
+            { name: 'exclureJoursFeries', label: 'Exclure les jours fériés',    checked: form.exclureJoursFeries },
+          ].map(({ name, label, checked }) => (
+            <label key={name}
+              className="flex items-center gap-3 p-3 rounded-xl border border-gray-200 bg-gray-50 cursor-pointer hover:border-teal-400 transition-colors select-none">
+              <div className="relative flex-shrink-0">
+                <input type="checkbox" name={name} checked={checked} onChange={handleChange} className="sr-only peer" />
+                <div className="w-10 h-5 rounded-full bg-gray-300 peer-checked:bg-teal-500 transition-colors" />
+                <div className="absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-5" />
+              </div>
+              <span className="text-sm font-medium text-gray-700">{label}</span>
+            </label>
+          ))}
         </div>
 
-        <div>
-          <IconLabel icon={Paperclip} color="#7c3aed">Attachement</IconLabel>
-          <input type="text" name="attachement" value={form.attachement} onChange={handleChange} placeholder="Lien ou référence document..."
+        {/* Nombre de jours */}
+        <div className="max-w-xs">
+          <IconLabel icon={Hash} color="#0891b2">Nombre de jours</IconLabel>
+          <input type="number" name="nombreJours" value={form.nombreJours} onChange={handleChange}
+            min="0" step="0.5" placeholder="0"
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50" />
         </div>
 
+        {/* Attachement */}
+        <div>
+          <IconLabel icon={Paperclip} color="#7c3aed">Attachement</IconLabel>
+          <input type="text" name="attachement" value={form.attachement} onChange={handleChange}
+            placeholder="Lien ou référence document..."
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50" />
+        </div>
+
+        {/* Commentaire */}
         <div>
           <IconLabel icon={MessageSquare} color="#64748b">Commentaire</IconLabel>
-          <textarea name="commentaire" value={form.commentaire} onChange={handleChange} rows={3} placeholder="Commentaire libre..."
+          <textarea name="commentaire" value={form.commentaire} onChange={handleChange} rows={3}
+            placeholder="Commentaire libre..."
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500 bg-gray-50 resize-none" />
         </div>
       </div>
