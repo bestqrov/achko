@@ -10,7 +10,8 @@ import {
   DollarSign, Shield, Car, CheckCircle, Receipt, Award,
   Key, FileCheck, Globe, BookOpen, Flame, AlertTriangle,
   Briefcase, Users, Users2, UserX, Umbrella, GraduationCap, HeartPulse, Stamp, BookMarked,
-  ChevronDown, ChevronRight, LogOut, Menu, X
+  ChevronDown, ChevronRight, LogOut, Menu, X,
+  Gauge, Clock, FileSignature, MapPin, Package, RotateCcw, Cpu, Archive,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth/authStore';
 import { useRouter } from 'next/navigation';
@@ -42,6 +43,20 @@ const NAV: NavSection[] = [
       { label: 'Carnets Métro.', href: '/dashboard/carnets-metrologiques', icon: BookOpen },
       { label: 'Extincteurs', href: '/dashboard/extincteurs', icon: Flame },
       { label: 'Sinistres', href: '/dashboard/sinistres', icon: AlertTriangle },
+    ],
+  },
+  {
+    section: 'FLOTTE',
+    items: [
+      { label: 'Véhicules',                href: '/dashboard/vehicules',                 icon: Truck },
+      { label: 'Kilométrages',             href: '/dashboard/kilometrages',              icon: Gauge },
+      { label: 'Indexe horaire',           href: '/dashboard/indexe-horaire',            icon: Clock },
+      { label: 'Contrats de leasing',      href: '/dashboard/contrats-leasing',          icon: FileSignature },
+      { label: 'Contrats de location',     href: '/dashboard/contrats-location',         icon: MapPin },
+      { label: "Contrats d'achat",         href: '/dashboard/contrats-achat',            icon: FileText },
+      { label: 'Véhicules de remplacement',href: '/dashboard/vehicules-remplacement',    icon: RotateCcw },
+      { label: 'Equipements véhicule',     href: '/dashboard/equipements-vehicule',      icon: Cpu },
+      { label: 'Véhicules réformés',       href: '/dashboard/vehicules-reformes',        icon: Archive },
     ],
   },
   {
