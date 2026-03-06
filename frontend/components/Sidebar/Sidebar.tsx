@@ -9,7 +9,8 @@ import {
   Wrench, Stethoscope, Settings, Fuel, CreditCard, BarChart3,
   DollarSign, Shield, Car, CheckCircle, Receipt, Award,
   Key, FileCheck, Globe, BookOpen, Flame, AlertTriangle,
-  Briefcase, Users, ChevronDown, ChevronRight, LogOut, Menu, X
+  Briefcase, Users, Users2, UserX, Umbrella, GraduationCap, HeartPulse, Stamp, BookMarked,
+  ChevronDown, ChevronRight, LogOut, Menu, X
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth/authStore';
 import { useRouter } from 'next/navigation';
@@ -56,8 +57,15 @@ const NAV: NavSection[] = [
   {
     section: 'GESTION',
     items: [
-      { label: 'Contrats', href: '/dashboard/contrats', icon: Briefcase },
-      { label: 'Salaires', href: '/dashboard/salaires', icon: Users },
+      { label: 'Collaborateurs',   href: '/dashboard/collaborateurs',  icon: Users2 },
+      { label: 'Contrats',         href: '/dashboard/contrats',         icon: Briefcase },
+      { label: 'Salaires',         href: '/dashboard/salaires',         icon: Users },
+      { label: 'Absence',          href: '/dashboard/absence',           icon: UserX },
+      { label: 'Congés',           href: '/dashboard/conges',            icon: Umbrella },
+      { label: 'Formations',       href: '/dashboard/formations',        icon: GraduationCap },
+      { label: 'Visite Médicale',  href: '/dashboard/visite-medicale',  icon: HeartPulse },
+      { label: 'Visas',            href: '/dashboard/visas',             icon: Stamp },
+      { label: 'Passeports',       href: '/dashboard/passeports',        icon: BookMarked },
     ],
   },
   {
