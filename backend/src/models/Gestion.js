@@ -33,6 +33,11 @@ const GestionSchema = new mongoose.Schema(
     nombreHeuresTravail:{ type: Number, default: 0 },
     attachement:        { type: String },
     commentaire:        { type: String },
+    // Extended salaire fields
+    prime:              { type: Number, default: 0 },
+    indemnitéTransport: { type: Number, default: 0 },
+    primeAnciennete:    { type: Number, default: 0 },
+    attachement:        { type: String },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
