@@ -49,8 +49,8 @@ Complete the initial setup (create admin account).
 | Key | Value |
 |-----|-------|
 | `NODE_ENV` | `production` |
-| `MONGODB_URI` | `mongodb+srv://...` |
-| `JWT_SECRET` | `your_very_long_secret_key` |
+| `MONGODB_URI` | `mongodb+srv://advicermano_db_tinljdid:qdK6aAF1rzY0Cn5e@cluster0.t3zjffy.mongodb.net/?appName=Cluster0` |
+| `JWT_SECRET` | `qwertyhgtfrdesawefbbbbbbbb2345565drdfdcbc` |
 | `JWT_EXPIRE` | `7d` |
 | `CLIENT_URL` | `https://arwapark.digima.cloud` |
 | `NEXT_PUBLIC_API_URL` | `https://arwapark.digima.cloud/api/v1` |
