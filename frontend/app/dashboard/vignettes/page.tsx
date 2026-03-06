@@ -11,7 +11,7 @@ const makeColumns = () => [
   { key: 'statut', label: 'Statut', render: (v: string) => <span className={cn(STATUS_COLORS[v] || 'badge-gray')}>{v}</span> },
 ];
 
-export function VignettesPage() {
+function VignettesPage() {
   return <GenericPage title="Vignettes" description="Gestion des vignettes fiscales" resource="administratif" columns={makeColumns()} createLabel="Nouvelle Vignette" searchPlaceholder="Rechercher une vignette..." />;
 }
 export default VignettesPage;
