@@ -1,0 +1,17 @@
+# Nixpacks configuration for ArwaPark monorepo
+# Runs backend (port 5000) + frontend (port 3000) from the repo root
+
+[phases.install]
+cmds = [
+  "npm install",
+  "cd backend && npm ci --only=production",
+  "cd frontend && npm ci"
+]
+
+[phases.build]
+cmds = [
+  "cd frontend && NEXT_TELEMETRY_DISABLED=1 NODE_ENV=production npm run build"
+]
+
+[start]
+cmd = "npm start"
