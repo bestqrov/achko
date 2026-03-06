@@ -1,11 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   UserCog, Plus, Mail, Shield, User, Trash2, Edit2,
   X, Save, Eye, EyeOff, Key, Lock, CheckCircle2,
-  Package, Truck, Users, AlertCircle,
+  Package, Truck, Users, AlertCircle, Loader2,
 } from 'lucide-react';
+import api from '@/lib/api/axios';
+import { useAuthStore } from '@/lib/auth/authStore';
 
 /* ── Pack limits (Basic) ─────────────────────────────── */
 const PACK = { name: 'Basic', maxVehicules: 20, maxChauffeurs: 20, currentVehicules: 13, currentChauffeurs: 8 };
@@ -13,17 +15,25 @@ const PACK = { name: 'Basic', maxVehicules: 20, maxChauffeurs: 20, currentVehicu
 const ROLES = ['Admin', 'Secrétaire'] as const;
 type Role = (typeof ROLES)[number];
 
+// Map between UI label and backend role value
+const ROLE_TO_API: Record<Role, string> = { Admin: 'admin', Secrétaire: 'secretary' };
+const API_TO_ROLE: Record<string, Role> = { admin: 'Admin', secretary: 'Secrétaire', superadmin: 'Admin' };
+
 const ROLE_META: Record<Role, { color: string; bg: string; border: string; desc: string }> = {
   Admin:      { color: 'text-red-700',    bg: 'bg-red-50',    border: 'border-red-200',    desc: 'Accès complet — gestion totale du système' },
   Secrétaire: { color: 'text-blue-700',   bg: 'bg-blue-50',   border: 'border-blue-200',   desc: 'Saisie, consultation et gestion courante' },
 };
 
-const INIT_USERS = [
-  { id: 1, nom: 'Admin Système',  login: 'admin',   email: 'admin@arwapark.ma',  role: 'Admin' as Role,      actif: true,  password: '' },
-  { id: 2, nom: 'Sara Alami',     login: 'sara',    email: 'sara@arwapark.ma',   role: 'Secrétaire' as Role, actif: true,  password: '' },
-];
-
-type User = typeof INIT_USERS[number];
+interface AppUser {
+  id: string;
+  nom: string;
+  login: string;
+  email: string;
+  role: Role;
+  actif: boolean;
+  password: string;
+}
+type User = AppUser;
 
 const inp = 'w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-violet-400 bg-white shadow-sm placeholder:text-gray-300 transition';
 
@@ -50,7 +60,7 @@ function UserModal({ user, onSave, onClose }: {
 }) {
   const isEdit = !!user;
   const [form, setForm] = useState<User>(user ?? {
-    id: Date.now(), nom: '', login: '', email: '', role: 'Secrétaire', actif: true, password: '',
+    id: '', nom: '', login: '', email: '', role: 'Secrétaire', actif: true, password: '',
   });
   const [confirm, setConfirm] = useState('');
   const [err, setErr] = useState('');
@@ -187,29 +197,69 @@ function UserModal({ user, onSave, onClose }: {
 
 /* ═══════════════════════════════════════════════════════ */
 export default function UtilisateursPage() {
-  const [users,   setUsers]   = useState<User[]>(INIT_USERS);
+  const authUser = useAuthStore((s) => s.user);
+  const [users,   setUsers]   = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modal,   setModal]   = useState<'create' | User | null>(null);
-  const [delId,   setDelId]   = useState<number | null>(null);
+  const [delId,   setDelId]   = useState<string | null>(null);
   const [success, setSuccess] = useState('');
+  const [apiErr,  setApiErr]  = useState('');
 
-  const flash = (msg: string) => {
-    setSuccess(msg);
-    setTimeout(() => setSuccess(''), 3500);
+  const flash = (msg: string) => { setSuccess(msg); setTimeout(() => setSuccess(''), 3500); };
+  const mapFromApi = (u: any): User => ({
+    id: u._id,
+    nom: `${u.firstName} ${u.lastName}`,
+    login: u.email.split('@')[0],
+    email: u.email,
+    role: API_TO_ROLE[u.role] ?? 'Secrétaire',
+    actif: u.isActive,
+    password: '',
+  });
+
+  // Load users from API
+  useEffect(() => {
+    api.get('/users').then(r => {
+      setUsers(r.data.data.map(mapFromApi));
+    }).catch(() => setApiErr('Impossible de charger les utilisateurs.')).finally(() => setLoading(false));
+  }, []);
+
+  const saveUser = async (u: User) => {
+    setApiErr('');
+    const [firstName, ...rest] = u.nom.trim().split(' ');
+    const lastName = rest.join(' ') || '—';
+    const payload: any = { firstName, lastName, email: u.email, role: ROLE_TO_API[u.role], isActive: u.actif };
+    if (u.password) payload.password = u.password;
+    try {
+      if (users.some(x => x.id === u.id)) {
+        // Edit
+        const r = await api.put(`/users/${u.id}`, payload);
+        setUsers(p => p.map(x => x.id === u.id ? mapFromApi(r.data.data) : x));
+      } else {
+        // Create — password required
+        const r = await api.post('/users', payload);
+        setUsers(p => [...p, mapFromApi(r.data.data)]);
+      }
+      setModal(null);
+      flash(`Utilisateur « ${u.nom} » enregistré.`);
+    } catch (e: any) {
+      setApiErr(e.response?.data?.message || 'Erreur lors de l\'enregistrement.');
+    }
   };
 
-  const saveUser = (u: User) => {
-    setUsers(p => p.some(x => x.id === u.id) ? p.map(x => x.id === u.id ? u : x) : [...p, u]);
-    setModal(null);
-    flash(u.nom ? `Utilisateur « ${u.nom} » enregistré.` : 'Utilisateur créé.');
+  const deleteUser = async (id: string) => {
+    setApiErr('');
+    try {
+      await api.delete(`/users/${id}`);
+      setUsers(p => p.filter(x => x.id !== id));
+      setDelId(null);
+      flash('Utilisateur supprimé.');
+    } catch (e: any) {
+      setApiErr(e.response?.data?.message || 'Erreur lors de la suppression.');
+      setDelId(null);
+    }
   };
 
-  const deleteUser = (id: number) => {
-    setUsers(p => p.filter(x => x.id !== id));
-    setDelId(null);
-    flash('Utilisateur supprimé.');
-  };
-
-  const maxUsers = 2; // Basic pack: 1 Admin + 1 Secrétaire max per licence
+  const maxUsers = 2;
   const canAdd = users.length < maxUsers;
 
   return (
@@ -293,6 +343,13 @@ export default function UtilisateursPage() {
         </div>
       </div>
 
+      {/* API error */}
+      {apiErr && (
+        <div className="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 rounded-2xl px-5 py-3 text-sm font-semibold shadow-sm">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" /> {apiErr}
+        </div>
+      )}
+
       {/* Flash */}
       {success && (
         <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-2xl px-5 py-3 text-sm font-semibold shadow-sm">
@@ -301,6 +358,11 @@ export default function UtilisateursPage() {
       )}
 
       {/* User list */}
+      {loading ? (
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="w-6 h-6 animate-spin text-violet-500" />
+        </div>
+      ) : (
       <div className="space-y-3">
         {users.map(u => {
           const meta = ROLE_META[u.role];
@@ -382,6 +444,7 @@ export default function UtilisateursPage() {
           </button>
         ))}
       </div>
+      )}
 
       {/* Create / Edit modal */}
       {modal && (

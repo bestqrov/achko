@@ -1,11 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/Sidebar/Sidebar';
 import Navbar from '@/components/Navbar/Navbar';
+import { useAuthStore } from '@/lib/auth/authStore';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { isAuthenticated, hydrate } = useAuthStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    hydrate();
+  }, [hydrate]);
+
+  useEffect(() => {
+    if (!useAuthStore.getState().isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isAuthenticated, router]);
+
+  if (!isAuthenticated) return null;
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
