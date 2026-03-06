@@ -24,10 +24,17 @@ const AdministratifSchema = new mongoose.Schema(
     },
     reference: { type: String },
     description: { type: String },
-    dateEmission: { type: Date },
-    dateExpiration: { type: Date },
+    dateEmission: { type: Date },   // dateDebut for vignette
+    dateExpiration: { type: Date }, // dateFin for vignette
     organisme: { type: String },
-    montant: { type: Number },
+    // Vignette-specific amount breakdown
+    montantPrincipal: { type: Number, default: 0 },
+    penalite:         { type: Number, default: 0 },
+    majoration:       { type: Number, default: 0 },
+    fraisService:     { type: Number, default: 0 },
+    timbre:           { type: Number, default: 0 },
+    tvaFraisService:  { type: Number, default: 0 },
+    montant: { type: Number }, // total (auto-computed or stored directly)
     statut: {
       type: String,
       enum: ['valide', 'expire', 'en_cours', 'suspendu'],
