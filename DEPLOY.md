@@ -34,53 +34,33 @@ Complete the initial setup (create admin account).
 
 ---
 
-## Step 3 — Deploy the Backend
+## Step 3 — Deploy (Single Container)
 
-1. Go to **Projects** → **New Project** → name it `ArwaPark Backend`
+1. Go to **Projects** → **New Project** → name it `ArwaPark`
 2. Click **Add New Resource** → **Application**
 3. Select your GitHub source → repo `bestqrov/achko`
 4. Configure:
    - **Branch**: `main`
    - **Build Pack**: `Dockerfile`
-   - **Dockerfile Location**: `backend/Dockerfile`
-   - **Port**: `5000`
+   - **Dockerfile Location**: `Dockerfile` *(root)*
+   - **Ports**: `5000, 3000`
 5. Set **Environment Variables**:
 
 | Key | Value |
 |-----|-------|
 | `NODE_ENV` | `production` |
-| `PORT` | `5000` |
 | `MONGODB_URI` | `mongodb+srv://...` |
 | `JWT_SECRET` | `your_very_long_secret_key` |
 | `JWT_EXPIRE` | `7d` |
 | `CLIENT_URL` | `https://app.yourdomain.com` |
-
-6. Under **Network** → set a domain e.g. `api.yourdomain.com`
-7. Enable **HTTPS** (Coolify handles Let's Encrypt automatically)
-8. Click **Deploy**
-
----
-
-## Step 4 — Deploy the Frontend
-
-1. In the same project → **Add New Resource** → **Application**
-2. Select same GitHub source
-3. Configure:
-   - **Branch**: `main`
-   - **Build Pack**: `Dockerfile`
-   - **Dockerfile Location**: `frontend/Dockerfile`
-   - **Port**: `3000`
-4. Set **Environment Variables**:
-
-| Key | Value |
-|-----|-------|
-| `NODE_ENV` | `production` |
 | `NEXT_PUBLIC_API_URL` | `https://api.yourdomain.com/api/v1` |
 | `NEXT_PUBLIC_DOMAIN` | `app.yourdomain.com` |
 
-5. Under **Network** → set domain e.g. `app.yourdomain.com`
-6. Enable **HTTPS**
-7. Click **Deploy**
+6. Under **Network**:
+   - Port `5000` → domain `api.yourdomain.com`
+   - Port `3000` → domain `app.yourdomain.com`
+7. Enable **HTTPS** on both domains (Let's Encrypt automatic)
+8. Click **Deploy**
 
 ---
 
