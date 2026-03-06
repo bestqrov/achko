@@ -32,6 +32,7 @@ WORKDIR /app/backend
 COPY backend/package*.json ./
 RUN npm ci --only=production
 
+# Copy all backend source (excludes .env via .dockerignore — env vars come from runtime)
 COPY backend/ .
 
 # ── Stage 3: Final Runtime Image ──────────────────────────────
@@ -44,6 +45,12 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+
+# Declare runtime env var keys (actual values injected by container platform or docker-compose)
+# Provide safe fallbacks only for non-secret, non-critical vars.
+ENV PORT=5000
+ENV JWT_EXPIRE=7d
+# MONGODB_URI and JWT_SECRET must be supplied at runtime — no default here for security.
 
 # ── Copy Backend ──────────────────────────────────────────────
 COPY --from=backend-builder /app/backend/node_modules ./backend/node_modules

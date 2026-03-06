@@ -52,13 +52,13 @@ Complete the initial setup (create admin account).
 | `MONGODB_URI` | `mongodb+srv://...` |
 | `JWT_SECRET` | `your_very_long_secret_key` |
 | `JWT_EXPIRE` | `7d` |
-| `CLIENT_URL` | `https://app.yourdomain.com` |
-| `NEXT_PUBLIC_API_URL` | `https://api.yourdomain.com/api/v1` |
-| `NEXT_PUBLIC_DOMAIN` | `app.yourdomain.com` |
+| `CLIENT_URL` | `https://arwapark.digima.cloud` |
+| `NEXT_PUBLIC_API_URL` | `https://arwapark.digima.cloud/api/v1` |
+| `NEXT_PUBLIC_DOMAIN` | `arwapark.digima.cloud` |
 
 6. Under **Network**:
-   - Port `5000` → domain `api.yourdomain.com`
-   - Port `3000` → domain `app.yourdomain.com`
+   - Port `5000` → domain `arwapark.digima.cloud` (API — routed via `/api` path)
+   - Port `3000` → domain `arwapark.digima.cloud` (Frontend)
 7. Enable **HTTPS** on both domains (Let's Encrypt automatic)
 8. Click **Deploy**
 
@@ -94,7 +94,7 @@ If you prefer to deploy the full stack as a single service:
 Register your admin account via API (run once):
 
 ```bash
-curl -X POST https://api.yourdomain.com/api/v1/auth/register \
+curl -X POST https://arwapark.digima.cloud/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "agencyName": "ArwaPark Agency",
@@ -106,7 +106,7 @@ curl -X POST https://api.yourdomain.com/api/v1/auth/register \
   }'
 ```
 
-Then log in at: `https://app.yourdomain.com/login`
+Then log in at: `https://arwapark.digima.cloud/login`
 
 ---
 
@@ -114,8 +114,8 @@ Then log in at: `https://app.yourdomain.com/login`
 
 | Service | URL |
 |---------|-----|
-| Backend health | `https://api.yourdomain.com/health` |
-| Frontend | `https://app.yourdomain.com` |
+| Backend health | `https://arwapark.digima.cloud/health` |
+| Frontend | `https://arwapark.digima.cloud` |
 
 ---
 

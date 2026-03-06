@@ -18,9 +18,9 @@ services:
       - MONGODB_URI=${MONGODB_URI}
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRE=${JWT_EXPIRE:-7d}
-      - CLIENT_URL=${CLIENT_URL:-http://localhost:3000}
-      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-      - NEXT_PUBLIC_DOMAIN=${NEXT_PUBLIC_DOMAIN:-localhost}
+      - CLIENT_URL=${CLIENT_URL:-https://arwapark.digima.cloud}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-https://arwapark.digima.cloud/api/v1}
+      - NEXT_PUBLIC_DOMAIN=${NEXT_PUBLIC_DOMAIN:-arwapark.digima.cloud}
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:5000/health"]
       interval: 30s
