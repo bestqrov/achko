@@ -82,7 +82,8 @@ const NAV: NavSection[] = [
     items: [
       { label: 'Interventions', href: '/dashboard/interventions', icon: Wrench },
       { label: 'Diagnostiques', href: '/dashboard/diagnostiques', icon: Stethoscope },
-      { label: 'Entretien', href: '/dashboard/entretien', icon: Settings },
+      { label: 'Entretien',        href: '/dashboard/entretien',      icon: Settings },
+      { label: "Plan d'entretien", href: '/dashboard/plan-entretien',  icon: ClipboardList },
     ],
   },
 ];
