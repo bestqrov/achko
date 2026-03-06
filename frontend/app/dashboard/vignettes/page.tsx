@@ -1,12 +1,258 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Plus, Paperclip } from 'lucide-react';
-import Modal from '@/components/Forms/Modal';
+import {
+  Plus, Paperclip, X, Hash, Truck, CalendarRange, CalendarCheck,
+  Banknote, AlertCircle, TrendingUp, ConciergeBell, Stamp, Percent,
+  Calculator, MessageSquare,
+} from 'lucide-react';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
 import { useResource, useCreateResource } from '@/hooks/useResource';
-import { formatDate, formatCurrency, cn, STATUS_COLORS } from '@/lib/utils/helpers';
+import { formatDate, cn, STATUS_COLORS } from '@/lib/utils/helpers';
+
+const EMPTY_FORM = {
+  reference: '',
+  vehicle: '',
+  dateEmission: '',
+  dateExpiration: '',
+  montantPrincipal: '',
+  penalite: '',
+  majoration: '',
+  fraisService: '',
+  timbre: '',
+  tvaFraisService: '',
+  notes: '',
+};
+
+const COLUMNS = [
+  { key: 'reference', label: 'Vignette' },
+  {
+    key: 'vehicle',
+    label: 'Véhicule',
+    render: (v: any) => v ? `${v.matricule} — ${v.brand} ${v.model}` : '—',
+  },
+  { key: 'dateEmission',   label: 'Date début',    render: (v: string) => formatDate(v) },
+  { key: 'dateExpiration', label: 'Date fin',       render: (v: string) => formatDate(v) },
+  { key: 'montant',        label: 'Montant Total',  render: (v: number) => v != null ? `${Number(v).toFixed(2)} DH` : '—' },
+  {
+    key: 'statut',
+    label: 'Statut',
+    render: (v: string) => (
+      <span className={cn('px-2 py-0.5 rounded-full text-xs font-medium', STATUS_COLORS[v] || 'bg-gray-100 text-gray-600')}>
+        {v}
+      </span>
+    ),
+  },
+];
+
+function IconLabel({ icon: Icon, color, children }: { icon: React.ElementType; color: string; children: React.ReactNode }) {
+  return (
+    <label className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-1">
+      <Icon className="w-4 h-4 flex-shrink-0" style={{ color }} />
+      {children}
+    </label>
+  );
+}
+
+function AmountField({
+  label, icon: Icon, iconColor, name, value, onChange,
+}: {
+  label: string; icon: React.ElementType; iconColor: string;
+  name: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}) {
+  return (
+    <div>
+      <IconLabel icon={Icon} color={iconColor}>{label}</IconLabel>
+      <div className="relative">
+        <input
+          type="number" min="0" step="0.01" name={name} value={value}
+          onChange={onChange} placeholder="0.00"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+        />
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">DH</span>
+      </div>
+    </div>
+  );
+}
+
+export default function VignettesPage() {
+  const [page, setPage]               = useState(1);
+  const [search, setSearch]           = useState('');
+  const [modalOpen, setModalOpen]     = useState(false);
+  const [form, setForm]               = useState(EMPTY_FORM);
+  const [attachement, setAttachement] = useState<File | null>(null);
+
+  const { data, isLoading }        = useResource<any>('administratif', { page, search, type: 'vignette' });
+  const { data: vehiclesData }     = useResource<any>('vehicles', { limit: 200 });
+  const create                     = useCreateResource('administratif');
+
+  const total = useMemo(() =>
+    ['montantPrincipal', 'penalite', 'majoration', 'fraisService', 'timbre', 'tvaFraisService']
+      .reduce((sum, k) => sum + (parseFloat((form as any)[k]) || 0), 0),
+  [form]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+
+  const handleClose = () => { setModalOpen(false); setForm(EMPTY_FORM); setAttachement(null); };
+
+  const handleSubmit = async () => {
+    await create.mutateAsync({
+      ...form, type: 'vignette', montant: total,
+      montantPrincipal: parseFloat(form.montantPrincipal) || 0,
+      penalite:         parseFloat(form.penalite)         || 0,
+      majoration:       parseFloat(form.majoration)       || 0,
+      fraisService:     parseFloat(form.fraisService)     || 0,
+      timbre:           parseFloat(form.timbre)           || 0,
+      tvaFraisService:  parseFloat(form.tvaFraisService)  || 0,
+    });
+    handleClose();
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Page header */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Vignettes</h2>
+          <p className="text-sm text-gray-500 mt-1">Historique et gestion des vignettes fiscales</p>
+        </div>
+        <button onClick={() => setModalOpen(true)} className="btn-primary flex items-center gap-2">
+          <Plus className="w-4 h-4" /> Ajouter
+        </button>
+      </div>
+
+      {/* Table */}
+      <SearchFilter onSearch={setSearch} placeholder="Rechercher une vignette..." filters={[]} />
+      <DataTable
+        columns={COLUMNS} data={data?.data || []} loading={isLoading}
+        total={data?.total || 0} page={page} pages={data?.pages || 1}
+        onPageChange={setPage} emptyMessage="Aucune vignette trouvée"
+      />
+
+      {/* ── Custom Modal with blue header ── */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleClose} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl flex flex-col max-h-[90vh]">
+
+            {/* Blue gradient header */}
+            <div className="flex items-center justify-between px-6 py-4 rounded-t-2xl"
+              style={{ background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 60%, #3b82f6 100%)' }}>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 bg-white/20 rounded-xl flex items-center justify-center">
+                  <Hash className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-white font-bold text-lg leading-tight">Nouvelle Vignette</h3>
+                  <p className="text-blue-100 text-xs">Remplissez les informations ci-dessous</p>
+                </div>
+              </div>
+              <button onClick={handleClose} className="w-8 h-8 rounded-lg bg-white/15 hover:bg-white/25 flex items-center justify-center transition-colors">
+                <X className="w-4 h-4 text-white" />
+              </button>
+            </div>
+
+            {/* Scrollable body */}
+            <div className="overflow-y-auto p-6 space-y-5 flex-1">
+
+              {/* Vignette + Véhicule */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <IconLabel icon={Hash} color="#2563eb">Vignette <span className="text-red-500 ml-0.5">*</span></IconLabel>
+                  <input type="text" name="reference" value={form.reference} onChange={handleChange}
+                    placeholder="Numéro / référence"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" />
+                </div>
+                <div>
+                  <IconLabel icon={Truck} color="#0891b2">Véhicule <span className="text-red-500 ml-0.5">*</span></IconLabel>
+                  <select name="vehicle" value={form.vehicle} onChange={handleChange}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                    <option value="">— Sélectionner —</option>
+                    {(vehiclesData?.data || []).map((v: any) => (
+                      <option key={v._id} value={v._id}>{v.matricule} — {v.brand} {v.model}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Informations générales */}
+              <div>
+                <h4 className="text-xs font-bold text-blue-700 uppercase tracking-widest mb-3 pb-1 border-b border-blue-100">
+                  Informations générales
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <IconLabel icon={CalendarRange} color="#16a34a">Date début</IconLabel>
+                    <input type="date" name="dateEmission" value={form.dateEmission} onChange={handleChange}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" />
+                  </div>
+                  <div>
+                    <IconLabel icon={CalendarCheck} color="#dc2626">Date fin</IconLabel>
+                    <input type="date" name="dateExpiration" value={form.dateExpiration} onChange={handleChange}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Amounts */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <AmountField label="Montant principal" icon={Banknote}       iconColor="#16a34a" name="montantPrincipal" value={form.montantPrincipal} onChange={handleChange} />
+                <AmountField label="Pénalité"          icon={AlertCircle}    iconColor="#dc2626" name="penalite"         value={form.penalite}         onChange={handleChange} />
+                <AmountField label="Majoration"        icon={TrendingUp}     iconColor="#ea580c" name="majoration"       value={form.majoration}       onChange={handleChange} />
+                <AmountField label="Frais service"     icon={ConciergeBell}  iconColor="#7c3aed" name="fraisService"     value={form.fraisService}     onChange={handleChange} />
+                <AmountField label="Timbre"            icon={Stamp}          iconColor="#0891b2" name="timbre"           value={form.timbre}           onChange={handleChange} />
+                <AmountField label="TVA frais service" icon={Percent}        iconColor="#d97706" name="tvaFraisService"  value={form.tvaFraisService}  onChange={handleChange} />
+              </div>
+
+              {/* Total */}
+              <div className="rounded-xl px-4 py-3 flex items-center justify-between"
+                style={{ background: 'linear-gradient(90deg, #eff6ff 0%, #dbeafe 100%)' }}>
+                <div className="flex items-center gap-2">
+                  <Calculator className="w-5 h-5 text-blue-600" />
+                  <span className="text-sm font-semibold text-blue-800">Montant Total</span>
+                </div>
+                <span className="text-xl font-bold text-blue-700">{total.toFixed(2)} DH</span>
+              </div>
+
+              {/* Attachement */}
+              <div>
+                <IconLabel icon={Paperclip} color="#6366f1">Attachement</IconLabel>
+                <label className="flex items-center gap-2 cursor-pointer w-fit border border-dashed border-indigo-300 rounded-lg px-4 py-2 text-sm text-indigo-500 hover:border-indigo-500 hover:bg-indigo-50 transition-colors">
+                  <Paperclip className="w-4 h-4" />
+                  {attachement ? attachement.name : 'Choisir un fichier'}
+                  <input type="file" className="hidden" onChange={(e) => setAttachement(e.target.files?.[0] || null)} />
+                </label>
+              </div>
+
+              {/* Commentaire */}
+              <div>
+                <IconLabel icon={MessageSquare} color="#64748b">Commentaire</IconLabel>
+                <textarea name="notes" value={form.notes} onChange={handleChange} rows={3}
+                  placeholder="Remarques..."
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 resize-none" />
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50 rounded-b-2xl">
+              <button className="btn-secondary" onClick={handleClose}>Annuler</button>
+              <button
+                className="btn-primary"
+                onClick={handleSubmit}
+                disabled={create.isPending || !form.reference || !form.vehicle}
+              >
+                {create.isPending ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 
 const EMPTY_FORM = {
   reference: '',
