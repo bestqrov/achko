@@ -2,16 +2,17 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils/helpers';
 import {
-  Truck, FileText, FileX, ClipboardList, Calendar, Navigation,
+  ChevronDown, ChevronRight, ChevronUp, LogOut, X, Truck,
+  Gauge, Clock, FileSignature, MapPin, Package, RotateCcw, Cpu, Archive,
+  Truck as _Truck, FileText, FileX, ClipboardList, Calendar, Navigation,
   Wrench, Stethoscope, Settings, Fuel, CreditCard, BarChart3,
   DollarSign, Shield, Car, CheckCircle, Receipt, Award,
   Key, FileCheck, Globe, BookOpen, Flame, AlertTriangle,
   Briefcase, Users, Users2, UserX, Umbrella, GraduationCap, HeartPulse, Stamp, BookMarked,
-  ChevronDown, ChevronRight, LogOut, Menu, X,
-  Gauge, Clock, FileSignature, MapPin, Package, RotateCcw, Cpu, Archive,
+  Menu,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth/authStore';
 import { useRouter } from 'next/navigation';
@@ -103,6 +104,8 @@ const NAV: NavSection[] = [
   },
 ];
 
+const PREVIEW = 3;
+
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
@@ -113,9 +116,27 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const logout = useAuthStore((s) => s.logout);
   const router = useRouter();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [expanded,  setExpanded]  = useState<Record<string, boolean>>({});
+
+  /* Auto-expand section when active item is beyond PREVIEW */
+  useEffect(() => {
+    NAV.forEach(({ section, items }) => {
+      const idx = items.findIndex(
+        ({ href }) => pathname === href || pathname.startsWith(href + '/')
+      );
+      if (idx >= PREVIEW) {
+        setExpanded(prev => ({ ...prev, [section]: true }));
+      }
+    });
+  }, [pathname]);
 
   const toggleSection = (section: string) => {
-    setCollapsed((prev) => ({ ...prev, [section]: !prev[section] }));
+    setCollapsed(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const toggleExpand = (section: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpanded(prev => ({ ...prev, [section]: !prev[section] }));
   };
 
   const handleLogout = () => {
@@ -174,7 +195,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
               {!collapsed[section] && (
                 <ul className="space-y-0.5">
-                  {items.map(({ label, href, icon: Icon }) => {
+                  {(expanded[section] ? items : items.slice(0, PREVIEW)).map(({ label, href, icon: Icon }) => {
                     const active = pathname === href || pathname.startsWith(href + '/');
                     return (
                       <li key={href}>
@@ -194,6 +215,28 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                       </li>
                     );
                   })}
+
+                  {/* Show more / show less */}
+                  {items.length > PREVIEW && (
+                    <li>
+                      <button
+                        onClick={(e) => toggleExpand(section, e)}
+                        className="flex items-center gap-2 w-full px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-150 text-white/40 hover:text-white/70 hover:bg-white/5"
+                      >
+                        {expanded[section] ? (
+                          <>
+                            <ChevronUp className="w-3.5 h-3.5" />
+                            <span>Réduire</span>
+                          </>
+                        ) : (
+                          <>
+                            <ChevronDown className="w-3.5 h-3.5" />
+                            <span>+{items.length - PREVIEW} de plus</span>
+                          </>
+                        )}
+                      </button>
+                    </li>
+                  )}
                 </ul>
               )}
             </div>
