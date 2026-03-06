@@ -12,7 +12,7 @@ import {
   DollarSign, Shield, Car, CheckCircle, Receipt, Award,
   Key, FileCheck, Globe, BookOpen, Flame, AlertTriangle,
   Briefcase, Users, Users2, UserX, Umbrella, GraduationCap, HeartPulse, Stamp, BookMarked,
-  Menu,
+  Menu, Building2, UserCog, Palette, HardDrive,
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth/authStore';
 import { useRouter } from 'next/navigation';
@@ -100,6 +100,15 @@ const NAV: NavSection[] = [
       { label: 'Diagnostiques', href: '/dashboard/diagnostiques', icon: Stethoscope },
       { label: 'Entretien',        href: '/dashboard/entretien',      icon: Settings },
       { label: "Plan d'entretien", href: '/dashboard/plan-entretien',  icon: ClipboardList },
+    ],
+  },
+  {
+    section: 'PARAMÈTRES',
+    items: [
+      { label: 'Profil projet',  href: '/dashboard/parametres/profil-projet', icon: Building2 },
+      { label: 'Utilisateurs',   href: '/dashboard/parametres/utilisateurs',  icon: UserCog },
+      { label: 'Thème',          href: '/dashboard/parametres/theme',         icon: Palette },
+      { label: 'Sauvegarde',     href: '/dashboard/parametres/sauvegarde',    icon: HardDrive },
     ],
   },
 ];
