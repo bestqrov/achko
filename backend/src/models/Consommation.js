@@ -33,6 +33,15 @@ const ConsommationSchema = new mongoose.Schema(
     categorie: { type: String },
     description: { type: String },
     justificatif: { type: String }, // file path/URL
+    typePaiement:       { type: String },
+    typeDep:            { type: String },
+    numeroUtilisation:  { type: String },
+    numeroImputation:   { type: String },
+    unite:              { type: String },
+    montantTTC:         { type: Number },
+    direction:          { type: String },
+    departement:        { type: String },
+    commentaire:        { type: String },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
