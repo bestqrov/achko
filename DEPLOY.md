@@ -34,34 +34,53 @@ Complete the initial setup (create admin account).
 
 ---
 
-## Step 3 — Deploy (Single Container)
+## Step 3 — Deploy Backend (Nixpacks — Node.js)
 
 1. Go to **Projects** → **New Project** → name it `ArwaPark`
 2. Click **Add New Resource** → **Application**
 3. Select your GitHub source → repo `bestqrov/achko`
 4. Configure:
    - **Branch**: `main`
-   - **Build Pack**: `Dockerfile` ⚠️ *IMPORTANT: must be `Dockerfile`, NOT `Nixpacks`. Nixpacks cannot detect this multi-service app.*
-   - **Dockerfile Location**: `Dockerfile` *(root of the repo)*
-   - **Docker Build Context**: `/` *(root)*
-   - **Ports**: `5000, 3000`
+   - **Build Pack**: `Nixpacks`
+   - **Base Directory**: `backend`
+   - **Port**: `5000`
 5. Set **Environment Variables**:
 
 | Key | Value |
 |-----|-------|
 | `NODE_ENV` | `production` |
+| `PORT` | `5000` |
 | `MONGODB_URI` | `mongodb+srv://advicermano_db_tinljdid:qdK6aAF1rzY0Cn5e@cluster0.t3zjffy.mongodb.net/?appName=Cluster0` |
 | `JWT_SECRET` | `qwertyhgtfrdesawefbbbbbbbb2345565drdfdcbc` |
 | `JWT_EXPIRE` | `7d` |
 | `CLIENT_URL` | `https://arwapark.digima.cloud` |
-| `NEXT_PUBLIC_API_URL` | `https://arwapark.digima.cloud/api/v1` |
+
+6. Under **Network** → assign domain: `api.arwapark.digima.cloud`
+7. Enable HTTPS (Let's Encrypt automatic)
+8. Click **Deploy**
+
+---
+
+## Step 4 — Deploy Frontend (Nixpacks — Next.js)
+
+1. In the same project → **Add New Resource** → **Application**
+2. Select your GitHub source → repo `bestqrov/achko`
+3. Configure:
+   - **Branch**: `main`
+   - **Build Pack**: `Nixpacks`
+   - **Base Directory**: `frontend`
+   - **Port**: `3000`
+4. Set **Environment Variables**:
+
+| Key | Value |
+|-----|-------|
+| `NODE_ENV` | `production` |
+| `NEXT_PUBLIC_API_URL` | `https://api.arwapark.digima.cloud/api/v1` |
 | `NEXT_PUBLIC_DOMAIN` | `arwapark.digima.cloud` |
 
-6. Under **Network**:
-   - Port `5000` → domain `arwapark.digima.cloud` (API — routed via `/api` path)
-   - Port `3000` → domain `arwapark.digima.cloud` (Frontend)
-7. Enable **HTTPS** on both domains (Let's Encrypt automatic)
-8. Click **Deploy**
+5. Under **Network** → assign domain: `arwapark.digima.cloud`
+6. Enable HTTPS (Let's Encrypt automatic)
+7. Click **Deploy**
 
 ---
 
@@ -71,22 +90,10 @@ In your domain registrar (or Hostinger hPanel), add:
 
 | Type | Name | Value |
 |------|------|-------|
+| `A` | `@` | `<your-vps-ip>` |
 | `A` | `api` | `<your-vps-ip>` |
-| `A` | `app` | `<your-vps-ip>` |
 
 Wait 5–30 minutes for DNS propagation.
-
----
-
-## Alternative — Deploy with Docker Compose
-
-If you prefer to deploy the full stack as a single service:
-
-1. In Coolify → **Add New Resource** → **Docker Compose**
-2. Select your GitHub repo
-3. Set **Docker Compose File**: `docker-compose.yml`
-4. Add all environment variables from `.env.example`
-5. Deploy
 
 ---
 
@@ -95,7 +102,7 @@ If you prefer to deploy the full stack as a single service:
 Register your admin account via API (run once):
 
 ```bash
-curl -X POST https://arwapark.digima.cloud/api/v1/auth/register \
+curl -X POST https://api.arwapark.digima.cloud/api/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "agencyName": "ArwaPark Agency",
@@ -115,7 +122,7 @@ Then log in at: `https://arwapark.digima.cloud/login`
 
 | Service | URL |
 |---------|-----|
-| Backend health | `https://arwapark.digima.cloud/health` |
+| Backend health | `https://api.arwapark.digima.cloud/health` |
 | Frontend | `https://arwapark.digima.cloud` |
 
 ---

@@ -2,7 +2,7 @@
 const nextConfig = {
   output: 'standalone',
   images: {
-    domains: ['localhost', process.env.NEXT_PUBLIC_DOMAIN || 'localhost'],
+    domains: ['localhost', 'arwapark.digima.cloud', process.env.NEXT_PUBLIC_DOMAIN || 'localhost'],
   },
 };
 
