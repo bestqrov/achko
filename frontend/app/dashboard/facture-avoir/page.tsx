@@ -36,7 +36,8 @@ const LIST_COLUMNS = [
   },
 ];
 
-const FACTURES_COLUMNS = [
+type FCol = { key: string; label: string; render?: (v: any) => React.ReactNode };
+const FACTURES_COLUMNS: FCol[] = [
   { key: 'numero',        label: 'Numéro' },
   { key: 'date',          label: 'Date',          render: (v: string) => formatDate(v) },
   { key: 'montantTTC',    label: 'Montant',        render: (v: number) => formatCurrency(v) },
