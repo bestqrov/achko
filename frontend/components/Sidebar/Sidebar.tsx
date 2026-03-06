@@ -27,33 +27,6 @@ interface NavSection {
 
 const NAV: NavSection[] = [
   {
-    section: 'TRANSPORT',
-    items: [
-      { label: 'Factures', href: '/dashboard/factures', icon: FileText },
-      { label: 'Facture Avoir', href: '/dashboard/facture-avoir', icon: FileX },
-      { label: 'Demandes Transport', href: '/dashboard/demandes-transport', icon: ClipboardList },
-      { label: 'Planning', href: '/dashboard/planning', icon: Calendar },
-      { label: 'Missions', href: '/dashboard/missions', icon: Navigation },
-    ],
-  },
-  {
-    section: 'MAINTENANCE',
-    items: [
-      { label: 'Interventions', href: '/dashboard/interventions', icon: Wrench },
-      { label: 'Diagnostiques', href: '/dashboard/diagnostiques', icon: Stethoscope },
-      { label: 'Entretien', href: '/dashboard/entretien', icon: Settings },
-    ],
-  },
-  {
-    section: 'CONSOMMATION',
-    items: [
-      { label: 'Carburant', href: '/dashboard/carburant', icon: Fuel },
-      { label: 'Cartes', href: '/dashboard/cartes', icon: CreditCard },
-      { label: 'Autoroutes', href: '/dashboard/autoroutes', icon: BarChart3 },
-      { label: 'Dépenses', href: '/dashboard/depenses', icon: DollarSign },
-    ],
-  },
-  {
     section: 'ADMINISTRATIF',
     items: [
       { label: 'Vignettes', href: '/dashboard/vignettes', icon: Shield },
@@ -71,10 +44,37 @@ const NAV: NavSection[] = [
     ],
   },
   {
+    section: 'TRANSPORT',
+    items: [
+      { label: 'Factures', href: '/dashboard/factures', icon: FileText },
+      { label: 'Facture Avoir', href: '/dashboard/facture-avoir', icon: FileX },
+      { label: 'Demandes Transport', href: '/dashboard/demandes-transport', icon: ClipboardList },
+      { label: 'Planning', href: '/dashboard/planning', icon: Calendar },
+      { label: 'Missions', href: '/dashboard/missions', icon: Navigation },
+    ],
+  },
+  {
     section: 'GESTION',
     items: [
       { label: 'Contrats', href: '/dashboard/contrats', icon: Briefcase },
       { label: 'Salaires', href: '/dashboard/salaires', icon: Users },
+    ],
+  },
+  {
+    section: 'CONSOMMATION',
+    items: [
+      { label: 'Carburant', href: '/dashboard/carburant', icon: Fuel },
+      { label: 'Cartes', href: '/dashboard/cartes', icon: CreditCard },
+      { label: 'Autoroutes', href: '/dashboard/autoroutes', icon: BarChart3 },
+      { label: 'Dépenses', href: '/dashboard/depenses', icon: DollarSign },
+    ],
+  },
+  {
+    section: 'MAINTENANCE',
+    items: [
+      { label: 'Interventions', href: '/dashboard/interventions', icon: Wrench },
+      { label: 'Diagnostiques', href: '/dashboard/diagnostiques', icon: Stethoscope },
+      { label: 'Entretien', href: '/dashboard/entretien', icon: Settings },
     ],
   },
 ];
