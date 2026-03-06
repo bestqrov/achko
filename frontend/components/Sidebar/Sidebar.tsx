@@ -236,7 +236,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                             )}
                           >
                             <Icon className="w-4 h-4 flex-shrink-0" />
-                            <span className="truncate">{label}</span>
+                            <span className="truncate flex-1">{label}</span>
+                            {/* Upgrade badge on Pack menu item when on Basic */}
+                            {href === '/dashboard/parametres/pack' && packName === 'basic' && (
+                              <span className="flex items-center gap-0.5 bg-amber-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wide flex-shrink-0">
+                                <Zap className="w-2.5 h-2.5" />
+                                Pro
+                              </span>
+                            )}
                           </Link>
                         )}
                       </li>
