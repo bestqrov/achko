@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://api.arwapark.digima.cloud/api/v1',
+  // Same-origin: Next.js rewrites /api/v1/* → backend localhost:5000/api/v1/*
+  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api/v1',
   headers: { 'Content-Type': 'application/json' },
 });
 
