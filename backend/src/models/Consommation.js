@@ -19,6 +19,16 @@ const ConsommationSchema = new mongoose.Schema(
     numeroCarte: { type: String },
     // For autoroutes
     troncon: { type: String },
+    peageDepart:    { type: String },
+    peageArrivee:   { type: String },
+    typePaiement:   { type: String },
+    montantHT:      { type: Number },
+    tva:            { type: Number },
+    montantTTC:     { type: Number },
+    collaborateur:  { type: String },
+    designation:    { type: String },
+    numero:         { type: String },
+    attachement:    { type: String },
     // For depenses
     categorie: { type: String },
     description: { type: String },
