@@ -34,6 +34,14 @@ const AdministratifSchema = new mongoose.Schema(
     fraisService:     { type: Number, default: 0 },
     timbre:           { type: Number, default: 0 },
     tvaFraisService:  { type: Number, default: 0 },
+    // Visite technique amount breakdown
+    tva:          { type: Number, default: 0 },
+    timbres:      { type: Number, default: 0 },
+    typeVisite:   { type: String },
+    centreVisite: { type: String },
+    cnpac:        { type: Number, default: 0 },
+    taxeCom:      { type: Number, default: 0 },
+    cneh:         { type: Number, default: 0 },
     montant: { type: Number }, // total (auto-computed or stored directly)
     statut: {
       type: String,
