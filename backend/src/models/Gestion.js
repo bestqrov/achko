@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const GestionSchema = new mongoose.Schema(
   {
     agencyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency', required: true },
-    type: { type: String, enum: ['contrat', 'salaire'], required: true },
+    type: { type: String, enum: ['contrat', 'salaire', 'carte', 'collaborateur', 'absence', 'conge', 'formation', 'visite_medicale', 'visa', 'passeport'], required: true },
     // Contrat
     employe: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     typeContrat: { type: String, enum: ['CDI', 'CDD', 'interim', 'stage'] },
@@ -38,6 +38,19 @@ const GestionSchema = new mongoose.Schema(
     indemnitéTransport: { type: Number, default: 0 },
     primeAnciennete:    { type: Number, default: 0 },
     attachement:        { type: String },
+    // Carte fields
+    nom:              { type: String },
+    soldeInitial:     { type: Number, default: 0 },
+    plafondCarburant: { type: Number },
+    plafondService:   { type: Number },
+    tagJawaz:         { type: String },
+    quota:            { type: String },
+    codePin:          { type: String },
+    flotte:           { type: String },
+    fournisseur:      { type: String },
+    activite:         { type: String },
+    typeCarte:        { type: String },
+    typeAffectation:  { type: String },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
