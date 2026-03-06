@@ -22,6 +22,7 @@ const consommationRoutes = require('./routes/consommation');
 const administratifRoutes = require('./routes/administratif');
 const gestionRoutes = require('./routes/gestion');
 const planEntretienRoutes = require('./routes/planEntretien');
+const kilometrageRoutes   = require('./routes/kilometrages');
 
 const app = express();
 
@@ -71,6 +72,7 @@ app.use(`${API}/consommation`, consommationRoutes);
 app.use(`${API}/administratif`, administratifRoutes);
 app.use(`${API}/gestion`, gestionRoutes);
 app.use(`${API}/plan-entretien`, planEntretienRoutes);
+app.use(`${API}/kilometrages`,   kilometrageRoutes);
 
 // Error handlers
 app.use(notFound);
