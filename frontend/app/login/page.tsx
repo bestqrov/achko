@@ -39,12 +39,12 @@ export default function LoginPage() {
             <Truck className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white">ArwaPark</h1>
-          <p className="text-primary-200 mt-1">Fleet Management Platform</p>
+          <p className="text-primary-200 mt-1">Gestion de flotte & transport</p>
         </div>
 
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-6">Sign in to your account</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-6">Connectez-vous à votre espace</h2>
 
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
@@ -101,7 +101,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-primary-200 text-sm mt-6">
-          © 2026 ArwaPark. All rights reserved.
+          © 2026 ArwaPark. Tous droits réservés.
         </p>
       </div>
     </div>
