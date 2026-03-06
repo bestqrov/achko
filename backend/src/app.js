@@ -27,7 +27,8 @@ const indexeHoraireRoutes  = require('./routes/indexeHoraire');
 const contratsLeasingRoutes  = require('./routes/contratsLeasing');
 const contratsLocationRoutes = require('./routes/contratsLocation');
 const contratsAchatRoutes        = require('./routes/contratsAchat');
-const vehiculesRemplacementRoutes = require('./routes/vehiculesRemplacement');
+const vehiculesRemplacementRoutes  = require('./routes/vehiculesRemplacement');
+const equipementsVehiculeRoutes    = require('./routes/equipementsVehicule');
 
 const app = express();
 
@@ -83,6 +84,7 @@ app.use(`${API}/contrats-leasing`,   contratsLeasingRoutes);
 app.use(`${API}/contrats-location`,  contratsLocationRoutes);
 app.use(`${API}/contrats-achat`,          contratsAchatRoutes);
 app.use(`${API}/vehicules-remplacement`, vehiculesRemplacementRoutes);
+app.use(`${API}/equipements-vehicule`,   equipementsVehiculeRoutes);
 
 // Error handlers
 app.use(notFound);
