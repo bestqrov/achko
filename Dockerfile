@@ -64,14 +64,13 @@ COPY --from=frontend-builder /app/frontend/.next/static     ./frontend/.next/sta
 COPY --from=frontend-builder /app/frontend/public           ./frontend/public
 
 # ── Supervisord config ────────────────────────────────────────
-RUN mkdir -p /var/log/supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Create non-root user
+# Create non-root user (no /var/log/supervisor needed — logs go to docker stdout)
 RUN addgroup -g 1001 -S arwapark && \
     adduser  -S arwapark -u 1001 -G arwapark && \
     mkdir -p /app/backend/logs && \
-    chown -R arwapark:arwapark /app /var/log/supervisor && \
+    chown -R arwapark:arwapark /app && \
     chmod 1777 /tmp
 
 USER arwapark
