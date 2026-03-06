@@ -41,8 +41,9 @@ Complete the initial setup (create admin account).
 3. Select your GitHub source → repo `bestqrov/achko`
 4. Configure:
    - **Branch**: `main`
-   - **Build Pack**: `Dockerfile`
-   - **Dockerfile Location**: `Dockerfile` *(root)*
+   - **Build Pack**: `Dockerfile` ⚠️ *IMPORTANT: must be `Dockerfile`, NOT `Nixpacks`. Nixpacks cannot detect this multi-service app.*
+   - **Dockerfile Location**: `Dockerfile` *(root of the repo)*
+   - **Docker Build Context**: `/` *(root)*
    - **Ports**: `5000, 3000`
 5. Set **Environment Variables**:
 
