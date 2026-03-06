@@ -53,6 +53,23 @@ const AdministratifSchema = new mongoose.Schema(
     cnpac:        { type: Number, default: 0 },
     taxeCom:      { type: Number, default: 0 },
     cneh:         { type: Number, default: 0 },
+    // Sinistre-specific fields
+    circonstances:   { type: String },
+    infoAdverse:     { type: String },
+    expert:          { type: String },
+    temoins:         { type: String },
+    autres:          { type: String },
+    dateDeclaration: { type: Date },
+    typeSinistre:    { type: String },
+    lieu:            { type: String },
+    constat:         { type: String },
+    rapports:        { type: String },
+    autoritePV:      { type: String },
+    numeroPV:        { type: String },
+    datePV:          { type: Date },
+    degatMateriel:   { type: Boolean, default: false },
+    degatCorporel:   { type: Boolean, default: false },
+    degatMortel:     { type: Boolean, default: false },
     montant: { type: Number }, // total (auto-computed or stored directly)
     statut: {
       type: String,
