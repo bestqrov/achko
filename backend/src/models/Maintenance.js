@@ -24,6 +24,14 @@ const MaintenanceSchema = new mongoose.Schema(
     prochainEntretien: { type: Date },
     prochainKilometrage: { type: Number },
     notes: { type: String },
+    // diagnostique-specific
+    chauffeur:    { type: String },
+    numero:       { type: String },
+    immobiliser:  { type: Boolean, default: false },
+    categorie:    { type: String },
+    sousType:     { type: String },
+    degreGravite: { type: String, enum: ['faible', 'modérée', 'élevée', 'critique'] },
+    degreUrgence: { type: String, enum: ['faible', 'normale', 'urgente', 'critique'] },
     // HT / TTC breakdown
     tva:                 { type: Number, default: 20 },
     montantMainOeuvreHT: { type: Number, default: 0 },

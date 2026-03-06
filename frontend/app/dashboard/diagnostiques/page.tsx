@@ -1,7 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Activity, BarChart3, Filter, RefreshCw } from 'lucide-react';
+import { Activity, BarChart3, Filter, RefreshCw, Plus } from 'lucide-react';
+import Modal from '@/components/Forms/Modal';
+import { useCreateResource } from '@/hooks/useResource';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
 import { useResource } from '@/hooks/useResource';
@@ -49,17 +51,57 @@ const COLS_DEMANDE: Col[] = [
 
 const COLS_DIAGNOSTIC: Col[] = [
   { key: 'titre',            label: 'N° système' },
-  { key: 'kilometrage',      label: 'Numéro',     render: (v) => v ? v.toLocaleString('fr-FR') : '—' },
+  { key: 'numero',           label: 'Numéro' },
   { key: 'dateIntervention', label: 'Date',       render: (v) => formatDate(v) },
-  { key: 'prestataire',      label: 'Utilisateur' },
+  { key: 'chauffeur',        label: 'Utilisateur' },
   { key: 'statut',           label: 'Statut',     render: badge },
 ];
+
+/* ── empty form ──────────────────────────────────────── */
+const EMPTY = {
+  vehicle: '', chauffeur: '', titre: '', numero: '',
+  dateIntervention: new Date().toISOString().slice(0, 10),
+  kilometrage: '', immobiliser: false,
+  description: '', notes: '',
+  categorie: '', sousType: '', degreGravite: '', degreUrgence: '',
+};
+
+const TYPES_OPTIONS   = ['Mécanique', 'Électrique', 'Électronique', 'Carrosserie', 'Autre'];
+const CATS_OPTIONS    = ['Préventif', 'Curatif', 'Réglementaire', 'Autre'];
+const GRAVITE_OPTIONS = ['faible', 'modérée', 'élevée', 'critique'];
+const URGENCE_OPTIONS = ['faible', 'normale', 'urgente', 'critique'];
 
 /* ── page ───────────────────────────────────────────── */
 export default function DiagnostiquesPage() {
   const [tab, setTab]       = useState<'demande' | 'diagnostic'>('demande');
   const [page, setPage]     = useState(1);
   const [search, setSearch] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm]         = useState<typeof EMPTY>(EMPTY);
+  const [saving, setSaving]     = useState(false);
+
+  const { data: vehicleData } = useResource<any>('vehicles', { limit: 999 });
+  const vehicles: any[] = vehicleData?.data ?? [];
+  const create = useCreateResource('maintenance');
+
+  const set = (field: string, val: any) => setForm(f => ({ ...f, [field]: val }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await create.mutateAsync({
+        ...form,
+        type: 'diagnostique',
+        statut: 'planifiée',
+        kilometrage: form.kilometrage ? Number(form.kilometrage) : undefined,
+      });
+      setShowForm(false);
+      setForm(EMPTY);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const demandeParams    = useMemo(() => ({ page, search, type: 'diagnostique', statut: 'planifiée' }), [page, search]);
   const diagParams       = useMemo(() => ({ page, search, type: 'diagnostique' }), [page, search]);
@@ -104,10 +146,16 @@ export default function DiagnostiquesPage() {
             </div>
           </div>
 
-          <button onClick={() => refetch()}
-            className="z-10 flex items-center gap-2 text-sm text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-all">
-            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} /> Actualiser
-          </button>
+          <div className="z-10 flex items-center gap-2">
+            <button onClick={() => setShowForm(true)}
+              className="flex items-center gap-2 text-sm font-semibold text-sky-900 bg-white hover:bg-sky-50 px-3 py-1.5 rounded-lg shadow transition-all">
+              <Plus className="w-4 h-4" /> Demande d&apos;intervention
+            </button>
+            <button onClick={() => refetch()}
+              className="flex items-center gap-2 text-sm text-white/80 hover:text-white bg-white/10 hover:bg-white/20 px-3 py-1.5 rounded-lg transition-all">
+              <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} /> Actualiser
+            </button>
+          </div>
         </div>
         <div className="flex h-1">
           {['#0c4a6e','#075985','#0369a1','#0284c7','#0ea5e9','#38bdf8'].map((c,i) => (
@@ -130,6 +178,145 @@ export default function DiagnostiquesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <StatCard icon={BarChart3} label="Nombre d'enregistrements" value={String(totalCount)} accent="#0284c7" iconBg="bg-sky-50" />
       </div>
+
+      {/* ── Create form modal ── */}
+      <Modal isOpen={showForm} onClose={() => { setShowForm(false); setForm(EMPTY); }}
+        title="Demande d'intervention" size="xl">
+        <form onSubmit={handleSubmit} className="space-y-5">
+
+          {/* Véhicule */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Véhicule <span className="text-red-500">*</span></label>
+            <select required value={form.vehicle} onChange={e => set('vehicle', e.target.value)}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-gray-50">
+              <option value="">Sélectionner un véhicule</option>
+              {vehicles.map(v => (
+                <option key={v._id} value={v._id}>
+                  {v.immatriculation ?? v.marque ?? v._id}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Chauffeur */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Chauffeur <span className="text-red-500">*</span></label>
+            <input required type="text" value={form.chauffeur} onChange={e => set('chauffeur', e.target.value)}
+              placeholder="Nom du chauffeur"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-gray-50" />
+          </div>
+
+          {/* Row: Désignation | Numéro | Date | Kilométrage */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">Désignation</label>
+              <input type="text" value={form.titre} onChange={e => set('titre', e.target.value)}
+                placeholder="Désignation"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-gray-50" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">Numéro</label>
+              <input type="text" value={form.numero} onChange={e => set('numero', e.target.value)}
+                placeholder="Numéro"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-gray-50" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">Date <span className="text-red-500">*</span></label>
+              <input required type="date" value={form.dateIntervention} onChange={e => set('dateIntervention', e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-gray-50" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 mb-1">Kilométrage</label>
+              <div className="relative">
+                <input type="number" min="0" value={form.kilometrage} onChange={e => set('kilometrage', e.target.value)}
+                  placeholder="0"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-gray-50" />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 font-medium">KM</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Immobiliser toggle */}
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={() => set('immobiliser', !form.immobiliser)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                form.immobiliser ? 'bg-sky-500' : 'bg-gray-200'
+              }`}>
+              <span className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                form.immobiliser ? 'translate-x-6' : 'translate-x-1'
+              }`} />
+            </button>
+            <span className="text-sm font-medium text-gray-700">Immobiliser</span>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Description <span className="text-red-500">*</span></label>
+            <textarea required rows={3} value={form.description} onChange={e => set('description', e.target.value)}
+              placeholder="Description de la demande"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-gray-50 resize-none" />
+          </div>
+
+          {/* Commentaire */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1">Commentaire</label>
+            <textarea rows={2} value={form.notes} onChange={e => set('notes', e.target.value)}
+              placeholder="Commentaire optionnel"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-gray-50 resize-none" />
+          </div>
+
+          {/* Informations générales */}
+          <div className="rounded-xl border border-sky-100 bg-sky-50/40 p-4 space-y-3">
+            <p className="text-xs font-bold text-sky-800 uppercase tracking-wider">Informations générales</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Catégories</label>
+                <select value={form.categorie} onChange={e => set('categorie', e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-white">
+                  <option value="">—</option>
+                  {CATS_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Type <span className="text-red-500">*</span></label>
+                <select required value={form.sousType} onChange={e => set('sousType', e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-white">
+                  <option value="">Sélectionner</option>
+                  {TYPES_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Degré de gravité</label>
+                <select value={form.degreGravite} onChange={e => set('degreGravite', e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-white">
+                  <option value="">—</option>
+                  {GRAVITE_OPTIONS.map(o => <option key={o} value={o} className="capitalize">{o}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Degré d&apos;urgence</label>
+                <select value={form.degreUrgence} onChange={e => set('degreUrgence', e.target.value)}
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 bg-white">
+                  <option value="">—</option>
+                  {URGENCE_OPTIONS.map(o => <option key={o} value={o} className="capitalize">{o}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="button" onClick={() => { setShowForm(false); setForm(EMPTY); }}
+              className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">
+              Annuler
+            </button>
+            <button type="submit" disabled={saving}
+              className="px-5 py-2 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-700 rounded-xl shadow transition-all disabled:opacity-60">
+              {saving ? 'Enregistrement...' : 'Enregistrer'}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* ── Tabbed table ── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
