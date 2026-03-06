@@ -283,7 +283,6 @@ export default function SinistresPage() {
                         bg,
                         form[name] ? 'ring-2 ring-offset-1' : 'opacity-70 hover:opacity-100'
                       )}
-                      style={form[name] ? { ringColor: color } : {}}
                     >
                       <span
                         className={cn(
