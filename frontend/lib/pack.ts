@@ -1,10 +1,13 @@
 // Pack configuration for ArwaPark SaaS
-// In production, currentPack would come from the authenticated user's subscription
+// currentPack is driven by user.pack coming from the auth store / JWT.
+// To switch a user's pack, update user.pack in the JWT payload and call setAuth().
+
+import { useAuthStore } from '@/lib/auth/authStore';
 
 export type PackName = 'basic' | 'pro';
 
 export interface PackConfig {
-  name: string;
+  name: PackName;
   label: string;
   price: string;
   priceNote: string;
@@ -96,12 +99,16 @@ export const PACKS: Record<PackName, PackConfig> = {
   },
 };
 
-// ── Current active pack ────────────────────────────────────────────────────────
-// TODO: replace with real subscription data from auth/API
-export const CURRENT_PACK: PackName = 'basic';
+// ── Hook — use this in every component that needs pack info ────────────────────
+export function usePack() {
+  const user = useAuthStore((s) => s.user);
+  const packName: PackName = (user?.pack as PackName) ?? 'basic';
+  const pack = PACKS[packName];
 
-export const currentPack = PACKS[CURRENT_PACK];
-
-export function isLocked(href: string): boolean {
-  return currentPack.lockedHrefs.includes(href);
+  return {
+    packName,
+    pack,
+    isLocked: (href: string) => pack.lockedHrefs.includes(href),
+  };
 }
+

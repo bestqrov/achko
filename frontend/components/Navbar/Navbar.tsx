@@ -5,7 +5,7 @@ import { useAuthStore } from '@/lib/auth/authStore';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { currentPack } from '@/lib/pack';
+import { usePack } from '@/lib/pack';
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -17,6 +17,7 @@ export default function Navbar({ onMenuClick, title = 'Dashboard' }: NavbarProps
   const router = useRouter();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const { pack } = usePack();
 
   useEffect(() => { hydrate(); }, [hydrate]);
 
@@ -91,14 +92,14 @@ export default function Navbar({ onMenuClick, title = 'Dashboard' }: NavbarProps
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Crown className="w-3.5 h-3.5 text-amber-500" />
-                    <span className="text-xs font-bold text-amber-700">Pack {currentPack.label}</span>
+                    <span className="text-xs font-bold text-amber-700">Pack {pack.label}</span>
                   </div>
                   <span className="text-[10px] font-semibold text-amber-600 bg-amber-100 px-1.5 py-0.5 rounded-full">
                     actif
                   </span>
                 </div>
                 <p className="text-[11px] text-gray-500 mt-0.5">
-                  {currentPack.maxVehicules} véhicules · {currentPack.maxUsers} utilisateurs
+                  {pack.maxVehicules} véhicules · {pack.maxUsers} utilisateurs
                 </p>
               </div>
 
@@ -111,7 +112,7 @@ export default function Navbar({ onMenuClick, title = 'Dashboard' }: NavbarProps
                 >
                   <Zap className="w-4 h-4 text-amber-500 group-hover:text-indigo-500 transition-colors" />
                   <span className="font-medium">Changer de pack</span>
-                  {currentPack.name === 'basic' && (
+                  {pack.name === 'basic' && (
                     <span className="ml-auto text-[10px] font-bold text-white bg-gradient-to-r from-amber-500 to-orange-500 px-1.5 py-0.5 rounded-full">
                       PRO
                     </span>

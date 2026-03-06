@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuthStore } from '@/lib/auth/authStore';
 import { useRouter } from 'next/navigation';
-import { currentPack, isLocked, PACKS } from '@/lib/pack';
+import { usePack } from '@/lib/pack';
 
 interface NavItem {
   label: string;
@@ -129,6 +129,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [expanded,  setExpanded]  = useState<Record<string, boolean>>({});
+  const { pack, isLocked, packName } = usePack();
 
   /* Auto-expand section when active item is beyond PREVIEW */
   useEffect(() => {
@@ -279,7 +280,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               <Crown className="w-3.5 h-3.5 text-amber-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-amber-400 leading-tight">Pack {currentPack.label}</p>
+              <p className="text-xs font-bold text-amber-400 leading-tight">Pack {pack.label}</p>
               <p className="text-[10px] text-white/40 group-hover:text-white/60 transition-colors leading-tight truncate">Passer en Pro →</p>
             </div>
             <Zap className="w-3.5 h-3.5 text-amber-400/60 group-hover:text-amber-400 flex-shrink-0 transition-colors" />

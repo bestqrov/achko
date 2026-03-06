@@ -7,6 +7,7 @@ interface User {
   email: string;
   role: string;
   agencyId: string;
+  pack?: 'basic' | 'pro';
 }
 
 interface AuthState {

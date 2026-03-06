@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Crown, Check, Lock, Zap, Phone, Mail, ArrowRight, Star, Shield, Truck } from 'lucide-react';
-import { PACKS, CURRENT_PACK, currentPack } from '@/lib/pack';
+import { Crown, Check, Lock, Zap, Phone, Mail, ArrowRight, Star, Shield, Truck, RefreshCw } from 'lucide-react';
+import { PACKS, usePack } from '@/lib/pack';
 
 const FEATURES_COMPARISON = [
   { label: 'Véhicules',             basic: '20 véhicules',    pro: '100 véhicules' },
@@ -40,6 +40,7 @@ function FeatureValue({ value }: { value: boolean | string }) {
 
 export default function PackPage() {
   const [contactOpen, setContactOpen] = useState(false);
+  const { packName, pack: currentPack } = usePack();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/20 p-6 space-y-8">
@@ -72,13 +73,22 @@ export default function PackPage() {
 
         {/* Basic */}
         <div className={`relative rounded-3xl border-2 overflow-hidden shadow-sm transition-all ${
-          CURRENT_PACK === 'basic'
+          packName === 'basic'
             ? 'border-indigo-400 bg-white'
             : 'border-gray-200 bg-white/70'
         }`}>
-          {CURRENT_PACK === 'basic' && (
-            <div className="absolute top-4 right-4 bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest">
-              Plan actuel
+          {packName === 'basic' && (
+            <div className="absolute top-4 right-4 flex items-center gap-1.5">
+              <div className="bg-indigo-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest flex items-center gap-1.5">
+                <span>Plan actuel</span>
+              </div>
+              <button
+                title="Renouveler / Changer de pack"
+                onClick={() => setContactOpen(true)}
+                className="w-6 h-6 rounded-full bg-indigo-100 hover:bg-indigo-200 flex items-center justify-center transition-colors"
+              >
+                <RefreshCw className="w-3 h-3 text-indigo-600" />
+              </button>
             </div>
           )}
           <div className="p-6">
@@ -119,7 +129,7 @@ export default function PackPage() {
               ))}
             </ul>
 
-            {CURRENT_PACK === 'basic' ? (
+            {packName === 'basic' ? (
               <div className="w-full py-3 rounded-xl border-2 border-indigo-200 text-center text-sm font-bold text-indigo-400">
                 Plan actuel
               </div>
@@ -133,15 +143,26 @@ export default function PackPage() {
 
         {/* Pro */}
         <div className={`relative rounded-3xl border-2 overflow-hidden shadow-lg transition-all ${
-          CURRENT_PACK === 'pro'
+          packName === 'pro'
             ? 'border-amber-400 bg-white'
             : 'border-amber-300 bg-gradient-to-br from-amber-50 to-yellow-50'
         }`}>
           {/* Popular badge */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-yellow-400" />
-          <div className="absolute top-4 right-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest flex items-center gap-1">
-            <Star className="w-2.5 h-2.5" />
-            {CURRENT_PACK === 'pro' ? 'Plan actuel' : 'Recommandé'}
+          <div className="absolute top-4 right-4 flex items-center gap-1.5">
+            <div className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-widest flex items-center gap-1">
+              <Star className="w-2.5 h-2.5" />
+              {packName === 'pro' ? 'Plan actuel' : 'Recommandé'}
+            </div>
+            {packName === 'pro' && (
+              <button
+                title="Renouveler votre abonnement"
+                onClick={() => setContactOpen(true)}
+                className="w-6 h-6 rounded-full bg-amber-100 hover:bg-amber-200 flex items-center justify-center transition-colors"
+              >
+                <RefreshCw className="w-3 h-3 text-amber-600" />
+              </button>
+            )}
           </div>
 
           <div className="p-6">
@@ -182,7 +203,7 @@ export default function PackPage() {
               ))}
             </ul>
 
-            {CURRENT_PACK === 'pro' ? (
+            {packName === 'pro' ? (
               <div className="w-full py-3 rounded-xl border-2 border-amber-300 text-center text-sm font-bold text-amber-500">
                 Plan actuel
               </div>
@@ -212,14 +233,14 @@ export default function PackPage() {
             <div className="bg-indigo-50 px-5 py-3.5 flex items-center justify-center gap-1.5">
               <Truck className="w-3.5 h-3.5 text-indigo-600" />
               <span className="text-xs font-bold text-indigo-700 uppercase tracking-widest">Basic</span>
-              {CURRENT_PACK === 'basic' && (
+              {packName === 'basic' && (
                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 ml-0.5" />
               )}
             </div>
             <div className="bg-amber-50 px-5 py-3.5 flex items-center justify-center gap-1.5">
               <Crown className="w-3.5 h-3.5 text-amber-600" />
               <span className="text-xs font-bold text-amber-700 uppercase tracking-widest">Pro</span>
-              {CURRENT_PACK === 'pro' && (
+              {packName === 'pro' && (
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-500 ml-0.5" />
               )}
             </div>
