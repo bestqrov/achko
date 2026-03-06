@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import {
-  Plus, ArrowLeft, User, Calendar, Hash,
-  MapPin, Paperclip, MessageSquare, GraduationCap, Tag,
+  Plus, ArrowLeft, User, Calendar,
+  Paperclip, MessageSquare, GraduationCap, Tag, Star, Building2,
 } from 'lucide-react';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
@@ -13,26 +13,51 @@ import { formatDate } from '@/lib/utils/helpers';
 const EMPTY_FORM = {
   type: 'formation',
   collaborateur: '',
-  intitule: '',
-  organisme: '',
+  libelle: '',
   typeFormation: '',
+  centreFormation: '',
   dateDebut: '',
   dateFin: '',
-  lieu: '',
-  dureeHeures: '',
-  cout: '',
+  evaluation: 0,
+  evaluationCentre: 0,
   attachement: '',
   commentaire: '',
 };
 
 type Col = { key: string; label: string; render?: (v: any) => React.ReactNode };
 const LIST_COLUMNS: Col[] = [
-  { key: 'collaborateur',  label: 'Collaborateur' },
-  { key: 'intitule',       label: 'Intitulé' },
-  { key: 'organisme',      label: 'Organisme' },
-  { key: 'dateDebut',      label: 'Du',  render: (v: string) => formatDate(v) },
-  { key: 'dateFin',        label: 'Au',  render: (v: string) => formatDate(v) },
+  { key: 'collaborateur',   label: 'Collaborateur' },
+  { key: 'libelle',         label: 'Libellé' },
+  { key: 'typeFormation',   label: 'Type' },
+  { key: 'centreFormation', label: 'Centre' },
+  { key: 'dateDebut',       label: 'Du',  render: (v: string) => formatDate(v) },
+  { key: 'dateFin',         label: 'Au',  render: (v: string) => formatDate(v) },
+  { key: 'evaluation',      label: 'Éval.' },
 ];
+
+function StarRating({ name, value, onChange }: { name: string; value: number; onChange: (name: string, val: number) => void }) {
+  return (
+    <div className="flex items-center gap-1 mt-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button key={star} type="button" onClick={() => onChange(name, star)}
+          className="p-0.5 transition-transform hover:scale-110 focus:outline-none">
+          <Star
+            className="w-7 h-7"
+            fill={star <= value ? '#f59e0b' : 'none'}
+            stroke={star <= value ? '#f59e0b' : '#d1d5db'}
+            strokeWidth={1.5}
+          />
+        </button>
+      ))}
+      {value > 0 && (
+        <button type="button" onClick={() => onChange(name, 0)}
+          className="ml-1 text-xs text-gray-400 hover:text-gray-600 transition-colors">
+          ✕
+        </button>
+      )}
+    </div>
+  );
+}
 
 function IconLabel({ icon: Icon, color, children }: { icon: React.ElementType; color: string; children: React.ReactNode }) {
   return (
@@ -54,6 +79,9 @@ export default function FormationsPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+
+  const handleStar = (name: string, val: number) =>
+    setForm((f) => ({ ...f, [name]: val }));
 
   const handleCancel = () => { setForm(EMPTY_FORM); setView('list'); };
 
@@ -103,41 +131,52 @@ export default function FormationsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
-        <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wider">Informations générales</p>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <IconLabel icon={User} color="#4338ca">Collaborateur *</IconLabel>
-            <input type="text" name="collaborateur" value={form.collaborateur} onChange={handleChange} placeholder="Nom du collaborateur"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50" />
-          </div>
-          <div>
-            <IconLabel icon={GraduationCap} color="#4f46e5">Intitulé de la formation *</IconLabel>
-            <input type="text" name="intitule" value={form.intitule} onChange={handleChange} placeholder="Titre de la formation"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50" />
-          </div>
+      {/* Collaborateur */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-4">Collaborateur</p>
+        <div>
+          <IconLabel icon={User} color="#4338ca">Collaborateur *</IconLabel>
+          <input type="text" name="collaborateur" value={form.collaborateur} onChange={handleChange}
+            placeholder="Nom du collaborateur"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50" />
         </div>
+      </div>
 
+      {/* Formation */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-5">
+        <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wider">Formation</p>
+
+        {/* Libellé | Type formation */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <IconLabel icon={Hash} color="#7c3aed">Organisme</IconLabel>
-            <input type="text" name="organisme" value={form.organisme} onChange={handleChange} placeholder="Centre de formation"
+            <IconLabel icon={GraduationCap} color="#4f46e5">Libellé</IconLabel>
+            <input type="text" name="libelle" value={form.libelle} onChange={handleChange}
+              placeholder="Intitulé de la formation"
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50" />
           </div>
           <div>
-            <IconLabel icon={Tag} color="#d97706">Type de formation</IconLabel>
+            <IconLabel icon={Tag} color="#d97706">Type formation</IconLabel>
             <select name="typeFormation" value={form.typeFormation} onChange={handleChange}
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50">
               <option value="">— Sélectionner —</option>
-              <option value="interne">Interne</option>
-              <option value="externe">Externe</option>
-              <option value="elearning">E-learning</option>
-              <option value="certifiante">Certifiante</option>
+              <option value="Interne">Interne</option>
+              <option value="Externe">Externe</option>
+              <option value="E-learning">E-learning</option>
+              <option value="Certifiante">Certifiante</option>
+              <option value="Réglementaire">Réglementaire</option>
             </select>
           </div>
         </div>
 
+        {/* Centre formation */}
+        <div>
+          <IconLabel icon={Building2} color="#0891b2">Centre formation</IconLabel>
+          <input type="text" name="centreFormation" value={form.centreFormation} onChange={handleChange}
+            placeholder="Nom du centre ou organisme de formation"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50" />
+        </div>
+
+        {/* Date début | Date fin */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <IconLabel icon={Calendar} color="#16a34a">Date début</IconLabel>
@@ -151,33 +190,37 @@ export default function FormationsPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div>
-            <IconLabel icon={MapPin} color="#0891b2">Lieu</IconLabel>
-            <input type="text" name="lieu" value={form.lieu} onChange={handleChange} placeholder="Lieu de formation"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50" />
+        {/* Évaluations — star rating */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="bg-indigo-50 rounded-xl p-4">
+            <p className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
+              <Star className="w-4 h-4 text-amber-400" /> Évaluation
+            </p>
+            <StarRating name="evaluation" value={form.evaluation} onChange={handleStar} />
+            <p className="text-xs text-gray-400 mt-2">Note de la formation ({form.evaluation}/5)</p>
           </div>
-          <div>
-            <IconLabel icon={Hash} color="#64748b">Durée (heures)</IconLabel>
-            <input type="number" name="dureeHeures" value={form.dureeHeures} onChange={handleChange} min="0" placeholder="0"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50" />
-          </div>
-          <div>
-            <IconLabel icon={Hash} color="#d97706">Coût (DH)</IconLabel>
-            <input type="number" name="cout" value={form.cout} onChange={handleChange} min="0" step="0.01" placeholder="0.00"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50" />
+          <div className="bg-indigo-50 rounded-xl p-4">
+            <p className="flex items-center gap-1.5 text-sm font-medium text-gray-700 mb-2">
+              <Star className="w-4 h-4 text-amber-400" /> Évaluation centre
+            </p>
+            <StarRating name="evaluationCentre" value={form.evaluationCentre} onChange={handleStar} />
+            <p className="text-xs text-gray-400 mt-2">Note du centre ({form.evaluationCentre}/5)</p>
           </div>
         </div>
 
+        {/* Attachement */}
         <div>
           <IconLabel icon={Paperclip} color="#7c3aed">Attachement</IconLabel>
-          <input type="text" name="attachement" value={form.attachement} onChange={handleChange} placeholder="Lien ou référence document..."
+          <input type="text" name="attachement" value={form.attachement} onChange={handleChange}
+            placeholder="Lien ou référence document..."
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50" />
         </div>
 
+        {/* Commentaire */}
         <div>
           <IconLabel icon={MessageSquare} color="#64748b">Commentaire</IconLabel>
-          <textarea name="commentaire" value={form.commentaire} onChange={handleChange} rows={3} placeholder="Commentaire libre..."
+          <textarea name="commentaire" value={form.commentaire} onChange={handleChange} rows={3}
+            placeholder="Commentaire libre..."
             className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-50 resize-none" />
         </div>
       </div>
@@ -187,7 +230,7 @@ export default function FormationsPage() {
         <button
           className="px-5 py-2 rounded-lg text-sm font-semibold text-white shadow-sm hover:opacity-90 transition-all disabled:opacity-50"
           style={{ background: 'linear-gradient(135deg, #312e81 0%, #4338ca 100%)' }}
-          onClick={handleSubmit} disabled={create.isPending || !form.collaborateur || !form.intitule}>
+          onClick={handleSubmit} disabled={create.isPending || !form.collaborateur}>
           {create.isPending ? 'Enregistrement...' : 'Enregistrer'}
         </button>
       </div>
