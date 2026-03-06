@@ -138,13 +138,13 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 onClick={() => toggleSection(section)}
                 className="flex items-center justify-between w-full px-2 mb-1 group"
               >
-                <span className="text-xs font-semibold text-white/40 tracking-widest uppercase">
+                <span className="text-xs font-bold tracking-widest uppercase" style={{ color: '#D4AF37' }}>
                   {section}
                 </span>
                 {collapsed[section] ? (
-                  <ChevronRight className="w-3 h-3 text-white/30" />
+                  <ChevronRight className="w-3 h-3" style={{ color: '#D4AF37' }} />
                 ) : (
-                  <ChevronDown className="w-3 h-3 text-white/30" />
+                  <ChevronDown className="w-3 h-3" style={{ color: '#D4AF37' }} />
                 )}
               </button>
 
