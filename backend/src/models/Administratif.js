@@ -36,6 +36,15 @@ const AdministratifSchema = new mongoose.Schema(
     tvaFraisService:  { type: Number, default: 0 },
     // Permis de circulation
     montantHT:    { type: Number, default: 0 },
+    // Assurance-specific fields
+    dateAssurance:     { type: Date },
+    typeAssurance:     { type: String },
+    numeroAttestation: { type: String },
+    numeroPolice:      { type: String },
+    dureeJours:        { type: Number, default: 0 },
+    intermediaire:     { type: String },
+    fraisTimbre:       { type: Number, default: 0 },
+    fraisContrat:      { type: Number, default: 0 },
     // Visite technique amount breakdown
     tva:          { type: Number, default: 0 },
     timbres:      { type: Number, default: 0 },
