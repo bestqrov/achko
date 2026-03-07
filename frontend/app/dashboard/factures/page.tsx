@@ -253,7 +253,6 @@ export default function FacturesPage() {
               placeholder="Nom du client" className="w-full"
               error={fieldErrors.client}
             />
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50" />
           </div>
           <div>
             <IconLabel icon={Truck} color="#0891b2">Véhicule</IconLabel>
