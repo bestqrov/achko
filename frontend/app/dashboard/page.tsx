@@ -9,6 +9,7 @@ import {
   Stamp, BookMarked, Umbrella, Navigation, BarChart3, TrendingUp,
   ShoppingCart, ClipboardList, Activity, CheckCircle2, Clock, Zap,
 } from 'lucide-react';
+import { useResource } from '@/hooks/useResource';
 
 /* ─── SVG Donut Chart ─────────────────────────────────── */
 function DonutChart({ segments, size = 80 }: {
