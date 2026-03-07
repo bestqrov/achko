@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
+import ValidatedInput from '@/components/Forms/ValidatedInput';
 import { useResource, useCreateResource } from '@/hooks/useResource';
 import { formatDate, cn, STATUS_COLORS } from '@/lib/utils/helpers';
 
@@ -68,6 +69,7 @@ export default function SinistresPage() {
   const [search, setSearch]       = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm]           = useState<any>(EMPTY_FORM);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
   const { data, isLoading }    = useResource<any>('administratif', { page, search, type: 'sinistre' });
   const { data: vehiclesData } = useResource<any>('vehicles', { limit: 200 });
@@ -82,6 +84,14 @@ export default function SinistresPage() {
   const handleClose = () => { setModalOpen(false); setForm(EMPTY_FORM); };
 
   const handleSubmit = async () => {
+    setFieldErrors({});
+    const errs: Record<string,string> = {};
+    if (!form.reference || !form.reference.trim()) errs.reference = 'Référence requise';
+    if (!form.vehicle) errs.vehicle = 'Véhicule requis';
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      return;
+    }
     await create.mutateAsync({ ...form, type: 'sinistre' });
     handleClose();
   };
@@ -142,20 +152,24 @@ export default function SinistresPage() {
               {/* Sinistre + Véhicule */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <IconLabel icon={AlertTriangle} color="#d97706">Sinistre *</IconLabel>
-                  <input type="text" name="reference" value={form.reference} onChange={handleChange}
-                    placeholder="Libellé du sinistre"
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-gray-50" />
+                  <ValidatedInput
+                    icon={AlertTriangle} label="Sinistre" required
+                    name="reference" value={form.reference} onChange={handleChange}
+                    placeholder="Libellé du sinistre" className="w-full"
+                    error={fieldErrors.reference}
+                  />
                 </div>
                 <div>
                   <IconLabel icon={Truck} color="#0891b2">Véhicule *</IconLabel>
                   <select name="vehicle" value={form.vehicle} onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-gray-50">
+                    className={`w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 bg-gray-50 ${fieldErrors.vehicle ? 'border-red-500' : ''}`}
+                  >
                     <option value="">— Sélectionner —</option>
                     {(vehiclesData?.data || []).map((v: any) => (
                       <option key={v._id} value={v._id}>{v.matricule} — {v.brand} {v.model}</option>
                     ))}
                   </select>
+                  {fieldErrors.vehicle && <p className="text-red-600 text-xs mt-1">{fieldErrors.vehicle}</p>}
                 </div>
               </div>
 

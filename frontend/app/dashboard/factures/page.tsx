@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
+import ValidatedInput from '@/components/Forms/ValidatedInput';
 import { useResource, useCreateResource } from '@/hooks/useResource';
 import { formatDate, formatCurrency, cn, STATUS_COLORS } from '@/lib/utils/helpers';
 
@@ -73,6 +74,7 @@ export default function FacturesPage() {
   const [page, setPage]         = useState(1);
   const [search, setSearch]     = useState('');
   const [form, setForm]         = useState(EMPTY_FORM);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
   const [tripFilter, setTripFilter] = useState(EMPTY_FILTER);
   const [tripPage, setTripPage] = useState(1);
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -110,6 +112,14 @@ export default function FacturesPage() {
   const handleCancel = () => { handleReset(); setView('list'); };
 
   const handleSubmit = async () => {
+    setFieldErrors({});
+    const errs: Record<string,string> = {};
+    if (!form.numero.trim()) errs.numero = 'N° système requis';
+    if (!form.client.trim()) errs.client = 'Client requis';
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      return;
+    }
     await create.mutateAsync({
       ...form,
       montantTTC,
@@ -211,10 +221,12 @@ export default function FacturesPage() {
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50" />
           </div>
           <div>
-            <IconLabel icon={Hash} color="#d97706">N° système *</IconLabel>
-            <input type="text" name="numero" value={form.numero} onChange={handleChange}
-              placeholder="Numéro unique"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50" />
+            <ValidatedInput
+              icon={Hash} label="N° système" required
+              name="numero" value={form.numero} onChange={handleChange}
+              placeholder="Numéro unique" className="w-full"
+              error={fieldErrors.numero}
+            />
           </div>
         </div>
 
@@ -235,9 +247,12 @@ export default function FacturesPage() {
         {/* Row 4: Client + Véhicule */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <IconLabel icon={User} color="#2563eb">Client *</IconLabel>
-            <input type="text" name="client" value={form.client} onChange={handleChange}
-              placeholder="Nom du client"
+            <ValidatedInput
+              icon={User} label="Client" required
+              name="client" value={form.client} onChange={handleChange}
+              placeholder="Nom du client" className="w-full"
+              error={fieldErrors.client}
+            />
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50" />
           </div>
           <div>

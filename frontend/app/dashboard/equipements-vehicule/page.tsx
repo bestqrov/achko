@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import SearchFilter from '@/components/Forms/SearchFilter';
 import DataTable    from '@/components/DataTable/DataTable';
+import ValidatedInput from '@/components/Forms/ValidatedInput';
 import { useResource, useCreateResource } from '@/hooks/useResource';
 
 /* ─── helpers ─── */
@@ -60,6 +61,7 @@ export default function EquipementsVehiculePage() {
   const [view,   setView]   = useState<'list' | 'form'>('list');
   const [search, setSearch] = useState('');
   const [form,   setForm]   = useState<Record<string, string>>(EMPTY);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
   const { data: equipementsData, isLoading } = useResource<any>('equipements-vehicule', {});
   const { data: vehiclesData }               = useResource<any>('vehicles', { page: 1, limit: 200 });
@@ -86,6 +88,14 @@ export default function EquipementsVehiculePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFieldErrors({});
+    const errs: Record<string,string> = {};
+    if (!form.vehicleId) errs.vehicleId = 'Véhicule requis';
+    if (!form.code?.trim()) errs.code = 'Code requis';
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      return;
+    }
     await create.mutateAsync({ ...form });
     setForm(EMPTY);
     setView('list');
@@ -168,7 +178,7 @@ export default function EquipementsVehiculePage() {
           {/* Véhicule */}
           <div className="bg-white rounded-2xl border border-cyan-200 shadow-sm p-5">
             <FL icon={Car} label="Véhicule" color="text-cyan-600" />
-            <select value={form.vehicleId} onChange={f('vehicleId')} className={inp('focus:ring-cyan-400')}>
+            <select value={form.vehicleId} onChange={f('vehicleId')} className={` ${inp('focus:ring-cyan-400')} ${fieldErrors.vehicleId ? 'border-red-500' : ''}`}>
               <option value="">— Sélectionner un véhicule —</option>
               {vehicles.map((v: any) => (
                 <option key={v._id} value={v._id}>
@@ -176,6 +186,7 @@ export default function EquipementsVehiculePage() {
                 </option>
               ))}
             </select>
+            {fieldErrors.vehicleId && <p className="text-red-600 text-xs mt-1">{fieldErrors.vehicleId}</p>}
           </div>
 
           {/* Informations générales */}
@@ -191,9 +202,12 @@ export default function EquipementsVehiculePage() {
               {/* Code + Montant HT / Libellé + TVA / Type + Montant TTC */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <FL icon={Hash} label="Code" color="text-cyan-600" />
-                  <input value={form.code} onChange={f('code')}
-                    placeholder="Ex : EQ-001" className={inp('focus:ring-cyan-400')} />
+                  <ValidatedInput
+                    icon={Hash} label="Code" required
+                    value={form.code} onChange={f('code')}
+                    placeholder="Ex : EQ-001" className="w-full"
+                    error={fieldErrors.code}
+                  />
                 </div>
                 <div>
                   <FL icon={Banknote} label="Montant HT" color="text-cyan-600" />

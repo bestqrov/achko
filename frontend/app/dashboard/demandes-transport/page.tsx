@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
+import ValidatedInput from '@/components/Forms/ValidatedInput';
 import { useResource, useCreateResource } from '@/hooks/useResource';
 import { formatDate, cn, STATUS_COLORS } from '@/lib/utils/helpers';
 
@@ -65,6 +66,7 @@ export default function DemandesTransportPage() {
   const [page, setPage]     = useState(1);
   const [search, setSearch] = useState('');
   const [form, setForm]     = useState(EMPTY_FORM);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
   const [specs, setSpecs]   = useState<{ specification: string; montantHT: string }[]>([]);
 
   const { data, isLoading }    = useResource<any>('trips', { page, search });
@@ -88,6 +90,15 @@ export default function DemandesTransportPage() {
   const handleCancel = () => { setForm(EMPTY_FORM); setSpecs([]); setView('list'); };
 
   const handleSubmit = async () => {
+    setFieldErrors({});
+    const errs: Record<string,string> = {};
+    if (!form.client.trim()) errs.client = 'Client requis';
+    if (!form.depart.trim()) errs.depart = 'Lieu de départ requis';
+    if (!form.destination.trim()) errs.destination = 'Lieu de destination requis';
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      return;
+    }
     await create.mutateAsync({
       ...form,
       specifications: specs.map((s) => ({ specification: s.specification, montantHT: parseFloat(s.montantHT) || 0 })),
@@ -171,10 +182,12 @@ export default function DemandesTransportPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <IconLabel icon={User} color="#2563eb">Client *</IconLabel>
-            <input type="text" name="client" value={form.client} onChange={handleChange}
-              placeholder="Nom du client"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-gray-50" />
+            <ValidatedInput
+              icon={User} label="Client" required
+              name="client" value={form.client} onChange={handleChange}
+              placeholder="Nom du client" className="w-full"
+              error={fieldErrors.client}
+            />
           </div>
           <div>
             <IconLabel icon={Tag} color="#d97706">Type trajet</IconLabel>
@@ -192,16 +205,20 @@ export default function DemandesTransportPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <IconLabel icon={Route} color="#16a34a">Départ</IconLabel>
-            <input type="text" name="depart" value={form.depart} onChange={handleChange}
-              placeholder="Ville / lieu de départ"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-gray-50" />
+            <ValidatedInput
+              icon={Route} label="Départ" required
+              name="depart" value={form.depart} onChange={handleChange}
+              placeholder="Ville / lieu de départ" className="w-full"
+              error={fieldErrors.depart}
+            />
           </div>
           <div>
-            <IconLabel icon={Route} color="#dc2626">Destination</IconLabel>
-            <input type="text" name="destination" value={form.destination} onChange={handleChange}
-              placeholder="Ville / lieu de destination"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 bg-gray-50" />
+            <ValidatedInput
+              icon={MapPin} label="Destination" required
+              name="destination" value={form.destination} onChange={handleChange}
+              placeholder="Ville / lieu de destination" className="w-full"
+              error={fieldErrors.destination}
+            />
           </div>
         </div>
       </div>

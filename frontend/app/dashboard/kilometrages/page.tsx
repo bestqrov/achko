@@ -5,6 +5,7 @@ import {
   Gauge, List, Plus, RefreshCw, Car, Calendar,
   ArrowUpRight, LayoutGrid, MessageSquare,
 } from 'lucide-react';
+import ValidatedInput from '@/components/Forms/ValidatedInput';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
 import { useResource, useCreateResource } from '@/hooks/useResource';
@@ -80,6 +81,7 @@ export default function KilometragesPage() {
   const [search, setSearch] = useState('');
   const [form, setForm]     = useState(EMPTY);
   const [saving, setSaving] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
   const params = useMemo(() => ({ page, search }), [page, search]);
   const { data, isLoading, refetch, isFetching } = useResource<any>('kilometrages', params);
@@ -93,6 +95,15 @@ export default function KilometragesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFieldErrors({});
+    const errs: Record<string,string> = {};
+    if (!form.vehicleId) errs.vehicleId = 'Véhicule requis';
+    if (!form.kilometrageDate) errs.kilometrageDate = 'Date requise';
+    if (!form.kilometres) errs.kilometres = 'Kilométrage requis';
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      return;
+    }
     setSaving(true);
     try {
       await create.mutateAsync({
@@ -219,10 +230,9 @@ export default function KilometragesPage() {
               <div>
                 <FL icon={Car} label="Véhicule" color="text-blue-600" />
                 <select
-                  required
                   value={form.vehicleId}
                   onChange={e => set('vehicleId', e.target.value)}
-                  className={inputCls('focus:ring-blue-400')}
+                  className={`${inputCls('focus:ring-blue-400')} ${fieldErrors.vehicleId ? 'border-red-500' : ''}`}
                 >
                   <option value="">— Sélectionner un véhicule —</option>
                   {vehicles.map((v: any) => (
@@ -232,17 +242,17 @@ export default function KilometragesPage() {
                     </option>
                   ))}
                 </select>
+                {fieldErrors.vehicleId && <p className="text-red-600 text-xs mt-1">{fieldErrors.vehicleId}</p>}
               </div>
 
               {/* Date + Kilomètres */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
-                  <FL icon={Calendar} label="Date kilométrage" color="text-violet-600" />
-                  <input
-                    type="date"
-                    required
+                  <ValidatedInput
+                    icon={Calendar} label="Date kilométrage" type="date" required
                     value={form.kilometrageDate}
                     onChange={e => set('kilometrageDate', e.target.value)}
+                    error={fieldErrors.kilometrageDate}
                     className={inputCls('focus:ring-violet-400')}
                   />
                 </div>
@@ -251,15 +261,15 @@ export default function KilometragesPage() {
                   <div className="relative">
                     <input
                       type="number"
-                      required
                       min="0"
                       value={form.kilometres}
                       onChange={e => set('kilometres', e.target.value)}
                       placeholder="0"
-                      className={`${inputCls('focus:ring-orange-400')} pr-12`}
+                      className={`${inputCls('focus:ring-orange-400')} pr-12 ${fieldErrors.kilometres ? 'border-red-500' : ''}`}
                     />
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-bold text-orange-500">km</span>
                   </div>
+                  {fieldErrors.kilometres && <p className="text-red-600 text-xs mt-1">{fieldErrors.kilometres}</p>}
                 </div>
               </div>
 
