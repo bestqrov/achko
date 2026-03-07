@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import {
   Plus, X, Flame, Hash, Weight,
-  CalendarDays, Store, Paperclip, MessageSquare,
+  CalendarDays, Store, Paperclip, MessageSquare, Car,
 } from 'lucide-react';
 import ValidatedInput from '@/components/Forms/ValidatedInput';
 import DataTable from '@/components/DataTable/DataTable';
