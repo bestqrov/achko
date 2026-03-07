@@ -5,6 +5,7 @@ import {
   Plus, X, Flame, Hash, Weight,
   CalendarDays, Store, Paperclip, MessageSquare,
 } from 'lucide-react';
+import ValidatedInput from '@/components/Forms/ValidatedInput';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
 import { useResource, useCreateResource } from '@/hooks/useResource';
@@ -49,6 +50,7 @@ export default function ExtincteursPage() {
   const [modalOpen, setModalOpen]     = useState(false);
   const [form, setForm]               = useState(EMPTY_FORM);
   const [attachement, setAttachement] = useState<File | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
   const { data, isLoading } = useResource<any>('administratif', { page, search, type: 'extincteur' });
   const create              = useCreateResource('administratif');
@@ -59,6 +61,11 @@ export default function ExtincteursPage() {
   const handleClose = () => { setModalOpen(false); setForm(EMPTY_FORM); setAttachement(null); };
 
   const handleSubmit = async () => {
+    setFieldErrors({});
+    const errs: Record<string,string> = {};
+    if (!form.reference.trim()) errs.reference = 'Référence requise';
+    if (!form.vehicle) errs.vehicle = 'Véhicule requis';
+    if (Object.keys(errs).length) { setFieldErrors(errs); return; }
     await create.mutateAsync({ ...form, type: 'extincteur' });
     handleClose();
   };
@@ -113,10 +120,12 @@ export default function ExtincteursPage() {
 
               {/* Extincteur label */}
               <div>
-                <IconLabel icon={Flame} color="#dc2626">Extincteur *</IconLabel>
-                <input type="text" name="reference" value={form.reference} onChange={handleChange}
-                  placeholder="Libellé de l'extincteur"
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-gray-50" />
+                <ValidatedInput
+                  icon={Flame} label="Extincteur" required
+                  name="reference" value={form.reference} onChange={handleChange}
+                  placeholder="Libellé de l'extincteur" className="w-full"
+                  error={fieldErrors.reference}
+                />
               </div>
 
               {/* Informations */}
