@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Truck, List, Plus, RefreshCw, Tag, Hash, Calendar, MapPin,
   Key, FileText, Car, Gauge, Camera, MessageSquare, Building2,
@@ -90,13 +90,27 @@ export default function VehiculesPage() {
   const [page, setPage]     = useState(1);
   const [search, setSearch] = useState('');
   const [form, setForm]     = useState(EMPTY);
-  const [saving, setSaving] = useState(false);
   const [error, setError]   = useState('');
   const [success, setSuccess] = useState('');
 
   const params = useMemo(() => ({ page, search }), [page, search]);
   const { data, isLoading, refetch, isFetching } = useResource<any>('vehicles', params);
   const create = useCreateResource('vehicles');
+
+  // Handle mutation states
+  useEffect(() => {
+    if (create.isSuccess) {
+      setSuccess('Véhicule créé avec succès !');
+      resetForm();
+      setView('list');
+      create.reset();
+    }
+    if (create.isError) {
+      setError(create.error?.response?.data?.message || create.error?.message || 'Erreur lors de la création du véhicule');
+      create.reset();
+    }
+  }, [create.isSuccess, create.isError, create.error]);
+
   const rows: any[] = data?.data ?? [];
 
   const set = (f: string, v: string) => setForm(p => ({ ...p, [f]: v }));
@@ -106,27 +120,17 @@ export default function VehiculesPage() {
     e.preventDefault();
     setError('');
     setSuccess('');
-    setSaving(true);
-    try {
-      await create.mutateAsync({
-        ...form,
-        kilometrageInitial:   form.kilometrageInitial   ? Number(form.kilometrageInitial)   : 0,
-        indexeHoraireInitial: form.indexeHoraireInitial ? Number(form.indexeHoraireInitial) : 0,
-        montantHT: form.montantHT ? Number(form.montantHT) : 0,
-        tva:       form.tva       ? Number(form.tva)       : 20,
-        matricule:     form.immatricule,
-        model:         form.modele,
-        color:         form.couleur,
-        chassisNumber: form.numeroChassis,
-      });
-      setSuccess('Véhicule créé avec succès !');
-      resetForm();
-      setView('list');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Erreur lors de la création du véhicule');
-    } finally {
-      setSaving(false);
-    }
+    create.mutate({
+      ...form,
+      kilometrageInitial:   form.kilometrageInitial   ? Number(form.kilometrageInitial)   : 0,
+      indexeHoraireInitial: form.indexeHoraireInitial ? Number(form.indexeHoraireInitial) : 0,
+      montantHT: form.montantHT ? Number(form.montantHT) : 0,
+      tva:       form.tva       ? Number(form.tva)       : 20,
+      matricule:     form.immatricule,
+      model:         form.modele,
+      color:         form.couleur,
+      chassisNumber: form.numeroChassis,
+    });
   };
 
   return (
@@ -425,10 +429,10 @@ export default function VehiculesPage() {
               className="px-5 py-2.5 text-sm font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all">
               Annuler
             </button>
-            <button type="submit" disabled={saving}
+            <button type="submit" disabled={create.isPending}
               className="px-7 py-2.5 text-sm font-bold text-white rounded-xl shadow-md transition-all disabled:opacity-60"
               style={{ background: 'linear-gradient(135deg,#2563eb,#4f46e5)' }}>
-              {saving ? 'Enregistrement...' : '✓ Enregistrer le véhicule'}
+              {create.isPending ? 'Enregistrement...' : '✓ Enregistrer le véhicule'}
             </button>
           </div>
         </form>
