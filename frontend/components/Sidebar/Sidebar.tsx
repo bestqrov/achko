@@ -32,6 +32,12 @@ interface NavSection {
 
 const NAV: NavSection[] = [
   {
+    section: 'TABLEAU DE BORD',
+    items: [
+      { label: 'Dashboard', href: '/dashboard', icon: BarChart3, alwaysUnlocked: true },
+    ],
+  },
+  {
     section: 'ADMINISTRATIF',
     items: [
       { label: 'Vignettes', href: '/dashboard/vignettes', icon: Shield },

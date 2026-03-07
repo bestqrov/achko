@@ -169,14 +169,14 @@ export default function DashboardPage() {
   });
 
   const fleetSegments = [
-    { value: 8, color: '#22c55e' },
-    { value: 3, color: '#f59e0b' },
-    { value: 1, color: '#ef4444' },
-    { value: 1, color: '#94a3b8' },
+    { value: 0, color: '#22c55e' },
+    { value: 0, color: '#f59e0b' },
+    { value: 0, color: '#ef4444' },
+    { value: 0, color: '#94a3b8' },
   ];
 
-  const fuelBars  = [45, 62, 38, 71, 55, 83, 49, 66, 77, 59, 90, 68];
-  const costSpark = [3800, 4200, 3600, 5100, 4700, 6200, 5400, 7100, 6800, 7400, 8040, 8240];
+  const fuelBars  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+  const costSpark = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 
   return (
     /* Full-height flex column — each inner col scrolls independently */
@@ -196,12 +196,12 @@ export default function DashboardPage() {
 
       {/* ── KPI strip ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 flex-shrink-0">
-        <KpiCard icon={Truck}    label="Véhicules"        value={13}        trend={2}   color="text-blue-600"   bg="bg-blue-50"   href="/dashboard/vehicules" />
-        <KpiCard icon={Users}    label="Collaborateurs"   value={24}        trend={5}   color="text-violet-600" bg="bg-violet-50" href="/dashboard/collaborateurs" />
-        <KpiCard icon={Fuel}     label="Carburant (mois)" value="8 240 DH"  trend={-3}  color="text-emerald-600" bg="bg-emerald-50" href="/dashboard/carburant" />
-        <KpiCard icon={Wrench}   label="Interventions"    value={4}         trend={0}   color="text-amber-600"  bg="bg-amber-50"  href="/dashboard/interventions" />
-        <KpiCard icon={FileText} label="Factures"         value={18}        trend={8}   color="text-cyan-600"   bg="bg-cyan-50"   href="/dashboard/factures" />
-        <KpiCard icon={Bell}     label="Alertes actives"  value={7}                     color="text-red-600"    bg="bg-red-50"    href="#alertes" />
+        <KpiCard icon={Truck}    label="Véhicules"        value={0}         trend={0}   color="text-blue-600"   bg="bg-blue-50"   href="/dashboard/vehicules" />
+        <KpiCard icon={Users}    label="Collaborateurs"   value={0}         trend={0}   color="text-violet-600" bg="bg-violet-50" href="/dashboard/collaborateurs" />
+        <KpiCard icon={Fuel}     label="Carburant (mois)" value="0 DH"      trend={0}   color="text-emerald-600" bg="bg-emerald-50" href="/dashboard/carburant" />
+        <KpiCard icon={Wrench}   label="Interventions"    value={0}         trend={0}   color="text-amber-600"  bg="bg-amber-50"  href="/dashboard/interventions" />
+        <KpiCard icon={FileText} label="Factures"         value={0}         trend={0}   color="text-cyan-600"   bg="bg-cyan-50"   href="/dashboard/factures" />
+        <KpiCard icon={Bell}     label="Alertes actives"  value={0}                     color="text-red-600"    bg="bg-red-50"    href="#alertes" />
       </div>
 
       {/* ── Dual scroll columns ── */}
@@ -218,17 +218,17 @@ export default function DashboardPage() {
                 <div className="relative">
                   <DonutChart segments={fleetSegments} size={90} />
                   <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                    <span className="text-lg font-extrabold text-gray-800">13</span>
+                    <span className="text-lg font-extrabold text-gray-800">0</span>
                   </div>
                 </div>
                 <span className="text-[9px] text-gray-400 mt-0.5">Total</span>
               </div>
               <div className="flex-1 space-y-2 min-w-[140px]">
                 {[
-                  { label: 'Disponibles', value: 8, pct: 62, color: '#22c55e' },
-                  { label: 'En mission',  value: 3, pct: 23, color: '#f59e0b' },
-                  { label: 'En panne',    value: 1, pct: 8,  color: '#ef4444' },
-                  { label: 'Réformés',    value: 1, pct: 8,  color: '#94a3b8' },
+                  { label: 'Disponibles', value: 0, pct: 0, color: '#22c55e' },
+                  { label: 'En mission',  value: 0, pct: 0, color: '#f59e0b' },
+                  { label: 'En panne',    value: 0, pct: 0, color: '#ef4444' },
+                  { label: 'Réformés',    value: 0, pct: 0, color: '#94a3b8' },
                 ].map(r => <StatusRow key={r.label} {...r} />)}
               </div>
               <div className="grid grid-cols-2 gap-1.5 content-start flex-shrink-0">
@@ -259,7 +259,7 @@ export default function DashboardPage() {
                   <span className="text-[10px] text-gray-400">Litres / mois (12 mois)</span>
                   <div className="flex items-center gap-1">
                     <Spark values={costSpark} color="#10b981" w={56} h={18} />
-                    <span className="text-[10px] text-emerald-600 font-bold">↑ 8%</span>
+                    <span className="text-[10px] text-gray-400 font-bold">— 0%</span>
                   </div>
                 </div>
                 <MiniBar values={fuelBars} color="#10b981" />
@@ -271,10 +271,10 @@ export default function DashboardPage() {
               </div>
               <div className="flex-shrink-0 space-y-1.5 min-w-[108px]">
                 {[
-                  { label: 'Total litres',  value: '4 820 L',   color: '#10b981' },
-                  { label: 'Coût mensuel',  value: '8 240 DH',  color: '#0d9488' },
-                  { label: 'Moy. conso.',   value: '9.2 L/100', color: '#0891b2' },
-                  { label: 'Km total',      value: '52 300 km', color: '#2563eb' },
+                  { label: 'Total litres',  value: '0 L',      color: '#10b981' },
+                  { label: 'Coût mensuel',  value: '0 DH',     color: '#0d9488' },
+                  { label: 'Moy. conso.',   value: '0 L/100',  color: '#0891b2' },
+                  { label: 'Km total',      value: '0 km',     color: '#2563eb' },
                 ].map(s => (
                   <div key={s.label} className="flex items-center justify-between gap-1.5 px-2.5 py-1.5 rounded-lg bg-gray-50 border border-gray-100">
                     <span className="text-[10px] text-gray-500">{s.label}</span>
@@ -290,12 +290,12 @@ export default function DashboardPage() {
             color="text-indigo-600" headBg="bg-indigo-50/70" border="border-indigo-100">
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
               {[
-                { icon: Wrench,        label: 'Interventions', count: 4,       href: '/dashboard/interventions',  bg: 'bg-indigo-50', color: 'text-indigo-500' },
-                { icon: Stethoscope,   label: 'Diagnostiques', count: 2,       href: '/dashboard/diagnostiques',  bg: 'bg-purple-50', color: 'text-purple-500' },
-                { icon: Settings,      label: 'Entretiens',    count: 7,       href: '/dashboard/entretien',      bg: 'bg-blue-50',   color: 'text-blue-500' },
-                { icon: ClipboardList, label: 'Plans',         count: 3,       href: '/dashboard/plan-entretien', bg: 'bg-teal-50',   color: 'text-teal-500' },
-                { icon: TrendingUp,    label: 'Km moyen',      count: '4 025', href: '/dashboard/kilometrages',   bg: 'bg-cyan-50',   color: 'text-cyan-500' },
-                { icon: AlertTriangle, label: 'En panne',      count: 1,       href: '/dashboard/interventions',  bg: 'bg-red-50',    color: 'text-red-500' },
+                { icon: Wrench,        label: 'Interventions', count: 0,   href: '/dashboard/interventions',  bg: 'bg-indigo-50', color: 'text-indigo-500' },
+                { icon: Stethoscope,   label: 'Diagnostiques', count: 0,   href: '/dashboard/diagnostiques',  bg: 'bg-purple-50', color: 'text-purple-500' },
+                { icon: Settings,      label: 'Entretiens',    count: 0,   href: '/dashboard/entretien',      bg: 'bg-blue-50',   color: 'text-blue-500' },
+                { icon: ClipboardList, label: 'Plans',         count: 0,   href: '/dashboard/plan-entretien', bg: 'bg-teal-50',   color: 'text-teal-500' },
+                { icon: TrendingUp,    label: 'Km moyen',      count: '0', href: '/dashboard/kilometrages',   bg: 'bg-cyan-50',   color: 'text-cyan-500' },
+                { icon: AlertTriangle, label: 'En panne',      count: 0,   href: '/dashboard/interventions',  bg: 'bg-red-50',    color: 'text-red-500' },
               ].map(item => (
                 <Link key={item.label} href={item.href}
                   className="flex flex-col items-center gap-1 p-2.5 rounded-xl border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/40 transition-all">
@@ -315,22 +315,22 @@ export default function DashboardPage() {
               {
                 title: 'Finance', icon: FileText, color: 'text-cyan-600', headBg: 'bg-cyan-50/70', border: 'border-cyan-100',
                 items: [
-                  { icon: FileText, label: 'Factures clients', count: 18, href: '/dashboard/factures',      dot: 'bg-cyan-400' },
-                  { icon: Receipt,  label: 'Avoirs',           count: 2,  href: '/dashboard/facture-avoir', dot: 'bg-sky-400' },
+                  { icon: FileText,  label: 'Factures clients', count: 0, href: '/dashboard/factures',      dot: 'bg-cyan-400' },
+                  { icon: Receipt,  label: 'Avoirs',           count: 0,  href: '/dashboard/facture-avoir', dot: 'bg-sky-400' },
                 ],
               },
               {
                 title: 'Achats', icon: ShoppingCart, color: 'text-violet-600', headBg: 'bg-violet-50/70', border: 'border-violet-100',
                 items: [
-                  { icon: FileText,      label: 'Fact. fournisseurs', count: 5, href: '/dashboard/depenses', dot: 'bg-violet-400' },
-                  { icon: ClipboardList, label: 'Bons de commande',   count: 3, href: '/dashboard/depenses', dot: 'bg-purple-400' },
+                  { icon: FileText,      label: 'Fact. fournisseurs', count: 0, href: '/dashboard/depenses', dot: 'bg-violet-400' },
+                  { icon: ClipboardList, label: 'Bons de commande',   count: 0, href: '/dashboard/depenses', dot: 'bg-purple-400' },
                 ],
               },
               {
                 title: 'Stock', icon: Package, color: 'text-orange-600', headBg: 'bg-orange-50/70', border: 'border-orange-100',
                 items: [
                   { icon: AlertTriangle, label: 'Ruptures stock', count: 0, href: '/dashboard/depenses', dot: 'bg-orange-400' },
-                  { icon: ClipboardList, label: 'Bons int.',      count: 1, href: '/dashboard/depenses', dot: 'bg-amber-400' },
+                  { icon: ClipboardList, label: 'Bons int.',      count: 0, href: '/dashboard/depenses', dot: 'bg-amber-400' },
                 ],
               },
             ].map(sec => (
@@ -375,21 +375,21 @@ export default function DashboardPage() {
             <span className="text-[10px] font-extrabold uppercase tracking-widest text-gray-500 flex-1">
               Alertes &amp; Expirations
             </span>
-            <span className="text-[10px] font-bold bg-red-100 text-red-700 px-2 py-0.5 rounded-full">7</span>
+            <span className="text-[10px] font-bold bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full">0</span>
           </div>
 
           <Block title="Administratifs" icon={ShieldCheck}
             color="text-red-500" headBg="bg-red-50/60" border="border-red-100">
             <div className="space-y-0.5">
               <AlertRow icon={Car}         label="Cartes grises"               count={0} href="/dashboard/cartes-grises"              dot="bg-blue-400" />
-              <AlertRow icon={Settings}    label="Visites techniques"           count={2} href="/dashboard/visites-techniques"         dot="bg-amber-400" />
+              <AlertRow icon={Settings}    label="Visites techniques"           count={0} href="/dashboard/visites-techniques"         dot="bg-amber-400" />
               <AlertRow icon={BookOpen}    label="Carnets métrologiques"        count={0} href="/dashboard/carnets-metrologiques"      dot="bg-teal-400" />
-              <AlertRow icon={ShieldCheck} label="Vignettes"                   count={3} href="/dashboard/vignettes"                  dot="bg-green-400" />
-              <AlertRow icon={ShieldCheck} label="Assurances"                  count={1} href="/dashboard/assurances"                 dot="bg-indigo-400" />
+              <AlertRow icon={ShieldCheck} label="Vignettes"                   count={0} href="/dashboard/vignettes"                  dot="bg-green-400" />
+              <AlertRow icon={ShieldCheck} label="Assurances"                  count={0} href="/dashboard/assurances"                 dot="bg-indigo-400" />
               <AlertRow icon={Receipt}     label="Taxes"                       count={0} href="/dashboard/taxes"                      dot="bg-violet-400" />
               <AlertRow icon={FileCheck}   label="Autorisations"               count={0} href="/dashboard/autorisations"              dot="bg-cyan-400" />
               <AlertRow icon={Key}         label="Permis circulation"           count={0} href="/dashboard/permis-circulation"         dot="bg-orange-400" />
-              <AlertRow icon={Flame}       label="Extincteurs"                 count={1} href="/dashboard/extincteurs"                dot="bg-red-400" />
+              <AlertRow icon={Flame}       label="Extincteurs"                 count={0} href="/dashboard/extincteurs"                dot="bg-red-400" />
               <AlertRow icon={Award}       label="Agréments"                   count={0} href="/dashboard/agrements"                  dot="bg-yellow-500" />
               <AlertRow icon={Globe}       label="Assurances intern."          count={0} href="/dashboard/assurances-internationales" dot="bg-blue-300" />
             </div>
@@ -407,7 +407,7 @@ export default function DashboardPage() {
             color="text-orange-600" headBg="bg-orange-50/60" border="border-orange-100">
             <div className="space-y-0.5">
               <AlertRow icon={Gauge}      label="Saisie kilométrage"  count={0} href="/dashboard/kilometrages"  dot="bg-orange-400" />
-              <AlertRow icon={Truck}      label="Véhicules en panne"  count={1} href="/dashboard/interventions" dot="bg-red-400" />
+              <AlertRow icon={Truck}      label="Véhicules en panne"  count={0} href="/dashboard/interventions" dot="bg-red-400" />
               <AlertRow icon={TrendingUp} label="Opérations KM"       count={0} href="/dashboard/entretien"     dot="bg-amber-400" />
               <AlertRow icon={Navigation} label="Pneumatique"         count={0} href="/dashboard/entretien"     dot="bg-blue-400" />
             </div>
