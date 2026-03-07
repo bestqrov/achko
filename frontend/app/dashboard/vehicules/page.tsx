@@ -93,6 +93,7 @@ export default function VehiculesPage() {
   const [form, setForm]     = useState(EMPTY);
   const [error, setError]   = useState('');
   const [success, setSuccess] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
   const params = useMemo(() => ({ page, search }), [page, search]);
   const { data, isLoading, refetch, isFetching } = useResource<any>('vehicles', params);
@@ -128,6 +129,18 @@ export default function VehiculesPage() {
     e.preventDefault();
     setError('');
     setSuccess('');
+    setFieldErrors({});
+
+    // simple client-side validation
+    const errs: Record<string,string> = {};
+    if (!form.designation.trim()) errs.designation = 'La désignation est requise';
+    if (!form.immatricule.trim()) errs.immatricule = 'L\'immatricule est requise';
+    // add more rules as needed
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      return;
+    }
+
     create.mutate({
       ...form,
       kilometrageInitial:   form.kilometrageInitial   ? Number(form.kilometrageInitial)   : 0,
@@ -255,14 +268,16 @@ export default function VehiculesPage() {
             {/* Row 1 */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <FL icon={Tag} label="Désignation" color="text-blue-600" />
-                <input type="text" value={form.designation} onChange={e => set('designation', e.target.value)}
+                <FL icon={Tag} label="Désignation" color="text-blue-600" /> <span className="text-red-500">*</span>
+                <input required type="text" value={form.designation} onChange={e => set('designation', e.target.value)}
                   placeholder="Désignation du véhicule" className={input('focus:ring-blue-400')} />
+                {fieldErrors.designation && <p className="text-red-600 text-xs mt-1">{fieldErrors.designation}</p>}
               </div>
               <div>
-                <FL icon={CreditCard} label="Immatricule" color="text-blue-600" />
-                <input type="text" value={form.immatricule} onChange={e => set('immatricule', e.target.value)}
+                <FL icon={CreditCard} label="Immatricule" color="text-blue-600" /> <span className="text-red-500">*</span>
+                <input required type="text" value={form.immatricule} onChange={e => set('immatricule', e.target.value)}
                   placeholder="AB-123-CD" className={input('focus:ring-blue-400')} />
+                {fieldErrors.immatricule && <p className="text-red-600 text-xs mt-1">{fieldErrors.immatricule}</p>}
               </div>
               <div>
                 <FL icon={ShoppingBag} label="Type d'acquisition" color="text-indigo-600" />
