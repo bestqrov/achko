@@ -8,6 +8,7 @@ import {
   DollarSign, Percent, ShieldCheck, Palette, Clock,
   ClipboardList, CreditCard, ShoppingBag, LayoutGrid,
 } from 'lucide-react';
+import ValidatedInput from '@/components/Forms/ValidatedInput';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
 import { useResource, useCreateResource } from '@/hooks/useResource';
@@ -267,18 +268,20 @@ export default function VehiculesPage() {
           >
             {/* Row 1 */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <FL icon={Tag} label="Désignation" color="text-blue-600" /> <span className="text-red-500">*</span>
-                <input required type="text" value={form.designation} onChange={e => set('designation', e.target.value)}
-                  placeholder="Désignation du véhicule" className={input('focus:ring-blue-400')} />
-                {fieldErrors.designation && <p className="text-red-600 text-xs mt-1">{fieldErrors.designation}</p>}
-              </div>
-              <div>
-                <FL icon={CreditCard} label="Immatricule" color="text-blue-600" /> <span className="text-red-500">*</span>
-                <input required type="text" value={form.immatricule} onChange={e => set('immatricule', e.target.value)}
-                  placeholder="AB-123-CD" className={input('focus:ring-blue-400')} />
-                {fieldErrors.immatricule && <p className="text-red-600 text-xs mt-1">{fieldErrors.immatricule}</p>}
-              </div>
+              <ValidatedInput
+                icon={Tag} label="Désignation" required
+                value={form.designation}
+                onChange={e => set('designation', e.target.value)}
+                placeholder="Désignation du véhicule"
+                error={fieldErrors.designation}
+              />
+              <ValidatedInput
+                icon={CreditCard} label="Immatricule" required
+                value={form.immatricule}
+                onChange={e => set('immatricule', e.target.value)}
+                placeholder="AB-123-CD"
+                error={fieldErrors.immatricule}
+              />
               <div>
                 <FL icon={ShoppingBag} label="Type d'acquisition" color="text-indigo-600" />
                 <select value={form.typeAcquisition} onChange={e => set('typeAcquisition', e.target.value)}
