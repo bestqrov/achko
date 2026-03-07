@@ -6,19 +6,40 @@ const createCrudService = (Model) => ({
   getAll: async (agencyId, query = {}) => {
     const { page = 1, limit = 20, sort = '-createdAt', ...filters } = query;
     const skip = (page - 1) * limit;
-    const data = await Model.find({ agencyId, ...filters })
+
+    let q = Model.find({ agencyId, ...filters })
       .sort(sort)
       .skip(skip)
-      .limit(Number(limit))
-      .populate('vehicle', 'matricule brand model')
-      .populate('driver', 'firstName lastName')
-      .populate('createdBy', 'firstName lastName');
+      .limit(Number(limit));
+
+    // only populate fields that actually exist on the schema
+    if (Model.schema.path('vehicle')) {
+      q = q.populate('vehicle', 'matricule brand model');
+    }
+    if (Model.schema.path('driver')) {
+      q = q.populate('driver', 'firstName lastName');
+    }
+    if (Model.schema.path('createdBy')) {
+      q = q.populate('createdBy', 'firstName lastName');
+    }
+
+    const data = await q;
     const total = await Model.countDocuments({ agencyId, ...filters });
     return { data, total, page: Number(page), pages: Math.ceil(total / limit) };
   },
 
   getOne: async (agencyId, id) => {
-    return Model.findOne({ _id: id, agencyId });
+    let q = Model.findOne({ _id: id, agencyId });
+    if (Model.schema.path('vehicle')) {
+      q = q.populate('vehicle', 'matricule brand model');
+    }
+    if (Model.schema.path('driver')) {
+      q = q.populate('driver', 'firstName lastName');
+    }
+    if (Model.schema.path('createdBy')) {
+      q = q.populate('createdBy', 'firstName lastName');
+    }
+    return q;
   },
 
   create: async (agencyId, userId, body) => {
