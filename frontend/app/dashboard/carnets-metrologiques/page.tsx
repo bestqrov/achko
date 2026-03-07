@@ -5,6 +5,7 @@ import {
   Plus, X, BookOpen, Truck, Hash,
   CalendarRange, CalendarCheck, Banknote, Percent, Wrench, Paperclip, MessageSquare,
 } from 'lucide-react';
+import ValidatedInput from '@/components/Forms/ValidatedInput';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
 import { useResource, useCreateResource } from '@/hooks/useResource';
@@ -58,6 +59,7 @@ export default function CarnetsMetrologiquesPage() {
   const [modalOpen, setModalOpen]     = useState(false);
   const [form, setForm]               = useState(EMPTY_FORM);
   const [attachement, setAttachement] = useState<File | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
   const { data, isLoading }    = useResource<any>('administratif', { page, search, type: 'carnet_metrologique' });
   const { data: vehiclesData } = useResource<any>('vehicles', { limit: 200 });
@@ -76,6 +78,11 @@ export default function CarnetsMetrologiquesPage() {
   const handleClose = () => { setModalOpen(false); setForm(EMPTY_FORM); setAttachement(null); };
 
   const handleSubmit = async () => {
+    setFieldErrors({});
+    const errs: Record<string,string> = {};
+    if (!form.reference.trim()) errs.reference = 'Référence requise';
+    if (!form.vehicle) errs.vehicle = 'Véhicule requis';
+    if (Object.keys(errs).length) { setFieldErrors(errs); return; }
     await create.mutateAsync({ ...form, type: 'carnet_metrologique', montant: montantTTC });
     handleClose();
   };
@@ -130,20 +137,25 @@ export default function CarnetsMetrologiquesPage() {
               {/* Carnet métrologique + Véhicule */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <IconLabel icon={BookOpen} color="#2563eb">Carnet métrologique *</IconLabel>
-                  <input type="text" name="reference" value={form.reference} onChange={handleChange}
-                    placeholder="Libellé du carnet"
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" />
+                  <ValidatedInput
+                    icon={BookOpen} label="Carnet métrologique" required
+                    name="reference" value={form.reference} onChange={handleChange}
+                    placeholder="Libellé du carnet" className="w-full"
+                    error={fieldErrors.reference}
+                  />
                 </div>
                 <div>
-                  <IconLabel icon={Truck} color="#0891b2">Véhicule *</IconLabel>
-                  <select name="vehicle" value={form.vehicle} onChange={handleChange}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
-                    <option value="">— Sélectionner —</option>
-                    {(vehiclesData?.data || []).map((v: any) => (
-                      <option key={v._id} value={v._id}>{v.matricule} — {v.brand} {v.model}</option>
-                    ))}
-                  </select>
+                  <div>
+                    <IconLabel icon={Truck} color="#0891b2">Véhicule</IconLabel>
+                    <select name="vehicle" value={form.vehicle} onChange={handleChange}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
+                      <option value="">— Sélectionner —</option>
+                      {(vehiclesData?.data || []).map((v: any) => (
+                        <option key={v._id} value={v._id}>{v.matricule} — {v.brand} {v.model}</option>
+                      ))}
+                    </select>
+                    {fieldErrors.vehicle && <p className="text-red-600 text-xs mt-1">{fieldErrors.vehicle}</p>}
+                  </div>
                 </div>
               </div>
 
