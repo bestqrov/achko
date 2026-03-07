@@ -30,6 +30,8 @@ const contratsAchatRoutes        = require('./routes/contratsAchat');
 const vehiculesRemplacementRoutes  = require('./routes/vehiculesRemplacement');
 const equipementsVehiculeRoutes    = require('./routes/equipementsVehicule');
 const vehiculesReformesRoutes      = require('./routes/vehiculesReformes');
+const depensesRoutes               = require('./routes/depenses');
+const planningRoutes               = require('./routes/planning');
 
 const app = express();
 
@@ -87,6 +89,8 @@ app.use(`${API}/contrats-achat`,          contratsAchatRoutes);
 app.use(`${API}/vehicules-remplacement`, vehiculesRemplacementRoutes);
 app.use(`${API}/equipements-vehicule`,   equipementsVehiculeRoutes);
 app.use(`${API}/vehicules-reformes`,     vehiculesReformesRoutes);
+app.use(`${API}/depenses`,                depensesRoutes);
+app.use(`${API}/planning`,                planningRoutes);
 
 // Error handlers
 app.use(notFound);
