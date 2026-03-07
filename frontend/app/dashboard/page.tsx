@@ -168,11 +168,16 @@ export default function DashboardPage() {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   });
 
+  // data hooks for analytics
+  const { data: vehData, refetch: refetchVeh } = useResource<any>('vehicles');
+  const { data: collabData } = useResource<any>('users');
+
+  // calculate fleet segments by status
   const fleetSegments = [
-    { value: 0, color: '#22c55e' },
-    { value: 0, color: '#f59e0b' },
-    { value: 0, color: '#ef4444' },
-    { value: 0, color: '#94a3b8' },
+    { value: vehData?.data.filter((v:any)=>v.status==='available').length || 0, color: '#22c55e' },
+    { value: vehData?.data.filter((v:any)=>v.status==='in_use').length || 0, color: '#f59e0b' },
+    { value: vehData?.data.filter((v:any)=>v.status==='maintenance').length || 0, color: '#ef4444' },
+    { value: vehData?.data.filter((v:any)=>v.status==='retired').length || 0, color: '#94a3b8' },
   ];
 
   const fuelBars  = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
@@ -196,8 +201,8 @@ export default function DashboardPage() {
 
       {/* ── KPI strip ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 flex-shrink-0">
-        <KpiCard icon={Truck}    label="Véhicules"        value={0}         trend={0}   color="text-blue-600"   bg="bg-blue-50"   href="/dashboard/vehicules" />
-        <KpiCard icon={Users}    label="Collaborateurs"   value={0}         trend={0}   color="text-violet-600" bg="bg-violet-50" href="/dashboard/collaborateurs" />
+        <KpiCard icon={Truck}    label="Véhicules"        value={vehData?.total ?? 0}        trend={0}   color="text-blue-600"   bg="bg-blue-50"   href="/dashboard/vehicules" />
+        <KpiCard icon={Users}    label="Collaborateurs"   value={collabData?.total ?? 0}    trend={0}   color="text-violet-600" bg="bg-violet-50" href="/dashboard/collaborateurs" />
         <KpiCard icon={Fuel}     label="Carburant (mois)" value="0 DH"      trend={0}   color="text-emerald-600" bg="bg-emerald-50" href="/dashboard/carburant" />
         <KpiCard icon={Wrench}   label="Interventions"    value={0}         trend={0}   color="text-amber-600"  bg="bg-amber-50"  href="/dashboard/interventions" />
         <KpiCard icon={FileText} label="Factures"         value={0}         trend={0}   color="text-cyan-600"   bg="bg-cyan-50"   href="/dashboard/factures" />
