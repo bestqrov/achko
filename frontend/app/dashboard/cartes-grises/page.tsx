@@ -5,6 +5,7 @@ import {
   Plus, X, FileText, Truck, Hash, CalendarRange, CalendarCheck,
   Paperclip, MessageSquare,
 } from 'lucide-react';
+import ValidatedInput from '@/components/Forms/ValidatedInput';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
 import { useResource, useCreateResource } from '@/hooks/useResource';
@@ -53,6 +54,7 @@ export default function CartesGrisesPage() {
   const [modalOpen, setModalOpen]     = useState(false);
   const [form, setForm]               = useState(EMPTY_FORM);
   const [attachement, setAttachement] = useState<File | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
   const { data, isLoading }    = useResource<any>('administratif', { page, search, type: 'carte-grise' });
   const { data: vehiclesData } = useResource<any>('vehicles', { limit: 200 });
@@ -64,6 +66,11 @@ export default function CartesGrisesPage() {
   const handleClose = () => { setModalOpen(false); setForm(EMPTY_FORM); setAttachement(null); };
 
   const handleSubmit = async () => {
+    setFieldErrors({});
+    const errs: Record<string,string> = {};
+    if (!form.vehicle) errs.vehicle = 'Véhicule requis';
+    if (!form.reference.trim()) errs.reference = 'Référence requise';
+    if (Object.keys(errs).length) { setFieldErrors(errs); return; }
     await create.mutateAsync({ ...form, type: 'carte-grise' });
     handleClose();
   };
@@ -117,7 +124,8 @@ export default function CartesGrisesPage() {
 
               {/* Véhicule */}
               <div>
-                <IconLabel icon={Truck} color="#0891b2">Véhicule *</IconLabel>
+              <div>
+                <IconLabel icon={Truck} color="#0891b2">Véhicule</IconLabel>
                 <select name="vehicle" value={form.vehicle} onChange={handleChange}
                   className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50">
                   <option value="">— Sélectionner —</option>
@@ -125,16 +133,20 @@ export default function CartesGrisesPage() {
                     <option key={v._id} value={v._id}>{v.matricule} — {v.brand} {v.model}</option>
                   ))}
                 </select>
+                {fieldErrors.vehicle && <p className="text-red-600 text-xs mt-1">{fieldErrors.vehicle}</p>}
+              </div>
               </div>
 
               {/* Informations générales */}
               <div className="border border-gray-100 rounded-xl p-4 space-y-4 bg-gray-50/50">
                 <p className="text-xs font-semibold text-blue-600 uppercase tracking-wider">Informations générales</p>
                 <div>
-                  <IconLabel icon={Hash} color="#7c3aed">Numéro *</IconLabel>
-                  <input type="text" name="reference" value={form.reference} onChange={handleChange}
-                    placeholder="Numéro de carte grise"
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white" />
+                  <ValidatedInput
+                    icon={Hash} label="Numéro" required
+                    name="reference" value={form.reference} onChange={handleChange}
+                    placeholder="Numéro de carte grise" className="w-full"
+                    error={fieldErrors.reference}
+                  />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
