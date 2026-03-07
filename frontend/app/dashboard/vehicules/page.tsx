@@ -91,6 +91,8 @@ export default function VehiculesPage() {
   const [search, setSearch] = useState('');
   const [form, setForm]     = useState(EMPTY);
   const [saving, setSaving] = useState(false);
+  const [error, setError]   = useState('');
+  const [success, setSuccess] = useState('');
 
   const params = useMemo(() => ({ page, search }), [page, search]);
   const { data, isLoading, refetch, isFetching } = useResource<any>('vehicles', params);
@@ -102,6 +104,8 @@ export default function VehiculesPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
+    setSuccess('');
     setSaving(true);
     try {
       await create.mutateAsync({
@@ -115,8 +119,11 @@ export default function VehiculesPage() {
         color:         form.couleur,
         chassisNumber: form.numeroChassis,
       });
+      setSuccess('Véhicule créé avec succès !');
       resetForm();
       setView('list');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Erreur lors de la création du véhicule');
     } finally {
       setSaving(false);
     }
@@ -149,12 +156,12 @@ export default function VehiculesPage() {
 
           <div className="z-10 flex items-center gap-2">
             {view === 'list' ? (
-              <button onClick={() => setView('form')}
+              <button onClick={() => { setView('form'); setError(''); setSuccess(''); }}
                 className="flex items-center gap-2 text-sm font-semibold text-blue-900 bg-white hover:bg-blue-50 px-3 py-1.5 rounded-lg shadow transition-all">
                 <Plus className="w-4 h-4" /> Nouveau véhicule
               </button>
             ) : (
-              <button onClick={() => { setView('list'); resetForm(); }}
+              <button onClick={() => { setView('list'); resetForm(); setError(''); setSuccess(''); }}
                 className="flex items-center gap-2 text-sm font-semibold text-blue-900 bg-white hover:bg-blue-50 px-3 py-1.5 rounded-lg shadow transition-all">
                 <List className="w-4 h-4" /> Voir la liste
               </button>
@@ -216,6 +223,16 @@ export default function VehiculesPage() {
       {/* ════════ FORM VIEW ════════ */}
       {view === 'form' && (
         <form onSubmit={handleSubmit} className="space-y-5">
+          {error && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
+              {success}
+            </div>
+          )}
 
           {/* ── Section: Identification ── */}
           <Section
