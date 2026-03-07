@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import { AxiosError } from 'axios';
 import {
   Truck, List, Plus, RefreshCw, Tag, Hash, Calendar, MapPin,
   Key, FileText, Car, Gauge, Camera, MessageSquare, Building2,
@@ -106,7 +107,14 @@ export default function VehiculesPage() {
       create.reset();
     }
     if (create.isError) {
-      setError(create.error?.response?.data?.message || create.error?.message || 'Erreur lors de la création du véhicule');
+      let message = 'Erreur lors de la création du véhicule';
+      const err = create.error;
+      if (err && typeof err === 'object' && 'isAxiosError' in err && (err as AxiosError).isAxiosError) {
+        message = ((err as AxiosError).response?.data as any)?.message || err.message || message;
+      } else if (err && typeof err === 'object' && 'message' in err) {
+        message = (err as any).message || message;
+      }
+      setError(message);
       create.reset();
     }
   }, [create.isSuccess, create.isError, create.error]);
