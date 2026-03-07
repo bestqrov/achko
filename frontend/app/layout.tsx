@@ -6,9 +6,9 @@ export const metadata: Metadata = {
   title: 'ArwaPark',
   description: 'Plateforme de gestion de flotte et transport',
   icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
-    apple: '/favicon.svg',
+    icon: '/car.svg',
+    shortcut: '/car.svg',
+    apple: '/car.svg',
   },
 };
 
