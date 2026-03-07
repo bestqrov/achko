@@ -13,6 +13,7 @@ import { formatDate, cn, STATUS_COLORS } from '@/lib/utils/helpers';
 
 const EMPTY_FORM = {
   reference: '',
+  vehicle: '',
   volume: '',
   dateEmission: '',
   organisme: '',
@@ -53,6 +54,8 @@ export default function ExtincteursPage() {
   const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
   const { data, isLoading } = useResource<any>('administratif', { page, search, type: 'extincteur' });
+  const { data: vData } = useResource<any>('vehicles', { limit: 200 });
+  const vehicles: any[] = vData?.data ?? [];
   const create              = useCreateResource('administratif');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
@@ -126,6 +129,21 @@ export default function ExtincteursPage() {
                   placeholder="Libellé de l'extincteur" className="w-full"
                   error={fieldErrors.reference}
                 />
+              </div>
+
+              {/* Véhicule associé */}
+              <div>
+                <IconLabel icon={Car} color="#0891b2">Véhicule *</IconLabel>
+                <select
+                  name="vehicle" value={form.vehicle} onChange={handleChange}
+                  className={`w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 bg-white ${fieldErrors.vehicle ? 'border-red-500' : ''}`}
+                >
+                  <option value="">— Sélectionner un véhicule —</option>
+                  {vehicles.map((v: any) => (
+                    <option key={v._id} value={v._id}>{v.matricule || v.designation || v._id}</option>
+                  ))}
+                </select>
+                {fieldErrors.vehicle && <p className="text-red-600 text-xs mt-1">{fieldErrors.vehicle}</p>}
               </div>
 
               {/* Informations */}
