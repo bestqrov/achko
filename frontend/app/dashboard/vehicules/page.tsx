@@ -90,13 +90,12 @@ const EMPTY = {
 export default function VehiculesPage() {
   const [view, setView]     = useState<'list' | 'form'>('list');
   const [page, setPage]     = useState(1);
-  const [search, setSearch] = useState('');
   const [form, setForm]     = useState(EMPTY);
   const [error, setError]   = useState('');
   const [success, setSuccess] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
-  const params = useMemo(() => ({ page, search }), [page, search]);
+  const params = useMemo(() => ({ page }), [page]);
   const { data, isLoading, refetch, isFetching } = useResource<any>('vehicles', params);
   const create = useCreateResource('vehicles');
 
@@ -228,7 +227,7 @@ export default function VehiculesPage() {
             ))}
           </div>
 
-          <SearchFilter onSearch={setSearch} placeholder="Rechercher un véhicule..." filters={[]} />
+          {/* تم حذف البحث بناءً على طلبك */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div className="px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center gap-2">
               <LayoutGrid className="w-4 h-4 text-white/80" />
