@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import DataTable from '@/components/DataTable/DataTable';
 import SearchFilter from '@/components/Forms/SearchFilter';
-import ValidatedInput from '../../components/Forms/ValidatedInput';
+import ValidatedInput from '../../../components/Forms/ValidatedInput';
 import { useResource, useCreateResource } from '@/hooks/useResource';
 import { formatDate } from '@/lib/utils/helpers';
 
