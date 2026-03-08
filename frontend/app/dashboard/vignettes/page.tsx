@@ -85,7 +85,7 @@ export default function VignettesPage() {
   const [attachement, setAttachement] = useState<File | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
-  const { data, isLoading }        = useResource<any>('administratif', { page, search, type: 'vignette' });
+  const { data, isLoading, refetch }        = useResource<any>('administratif', { page, search, type: 'vignette' });
   const { data: vehiclesData }     = useResource<any>('vehicles', { limit: 200 });
   const create                     = useCreateResource('administratif');
 
@@ -119,6 +119,7 @@ export default function VignettesPage() {
       timbre:           parseFloat(form.timbre)           || 0,
       tvaFraisService:  parseFloat(form.tvaFraisService)  || 0,
     });
+    refetch(); // تحديث القائمة بعد الإضافة
     handleClose();
   };
 

@@ -152,6 +152,7 @@ export default function VehiculesPage() {
       color:         form.couleur,
       chassisNumber: form.numeroChassis,
     });
+    refetch(); // تحديث القائمة بعد الإضافة
   };
 
   return (

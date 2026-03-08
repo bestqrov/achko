@@ -58,7 +58,7 @@ export default function PlanningPage() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
-  const { data, isLoading } = useResource<any>('planning', { page, search });
+  const { data, isLoading, refetch } = useResource<any>('planning', { page, search });
   const { data: vehiclesData } = useResource<any>('vehicles', { limit: 200 });
   const { data: usersData } = useResource<any>('users', { limit: 200 });
   const create = useCreateResource('planning');
@@ -87,6 +87,7 @@ export default function PlanningPage() {
       ...form,
       coutEstime: form.coutEstime ? Number(form.coutEstime) : 0,
     });
+    refetch(); // تحديث القائمة بعد الإضافة
     handleCancel();
   };
 
