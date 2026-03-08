@@ -178,7 +178,9 @@ export default function VehiculesPage() {
 
   // إصلاح: تعريف دالة resetForm
   const resetForm = () => setForm(EMPTY);
-  // إصلاح: تعريف متغير rows ليكون متاحًا في جميع أجزاء الدالة
+
+  const params = useMemo(() => ({ page }), [page]);
+  const { data, isLoading, refetch, isFetching } = useResource<any>('vehicles', params);
   const rows: any[] = data?.data ?? [];
 
   const params = useMemo(() => ({ page }), [page]);
