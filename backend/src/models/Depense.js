@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+alconst mongoose = require('mongoose');
 
 const DepenseSchema = new mongoose.Schema(
   {
