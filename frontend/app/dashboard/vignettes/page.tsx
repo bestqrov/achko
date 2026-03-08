@@ -26,6 +26,9 @@ const EMPTY_FORM = {
   notes: '',
 };
 
+import { Edit, Trash2 } from 'lucide-react';
+import { useDeleteResource, useUpdateResource } from '@/hooks/useResource';
+
 const COLUMNS = [
   { key: 'reference', label: 'Vignette' },
   {
@@ -45,7 +48,81 @@ const COLUMNS = [
       </span>
     ),
   },
+  {
+    key: 'actions', label: 'إجراءات',
+    render: (_: any, row: any) => <ActionsCell row={row} />,
+  },
 ];
+function ActionsCell({ row }: { row: any }) {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const deleteVignette = useDeleteResource('administratif');
+  const { refetch } = useResource<any>('administratif', { type: 'vignette' });
+  const [editMode, setEditMode] = useState(false);
+  const [editError, setEditError] = useState('');
+  const updateVignette = useUpdateResource('administratif');
+  const [editForm, setEditForm] = useState(row);
+
+  const handleDelete = async () => {
+    setEditError('');
+    try {
+      await deleteVignette.mutateAsync(row._id);
+      setShowConfirm(false);
+      refetch();
+    } catch (e: any) {
+      setEditError('فشل الحذف');
+    }
+  };
+
+  const handleEdit = async () => {
+    setEditError('');
+    try {
+      await updateVignette.mutateAsync({ id: row._id, body: editForm });
+      setEditMode(false);
+      refetch();
+    } catch (e: any) {
+      setEditError('فشل التعديل');
+    }
+  };
+
+  return (
+    <div className="flex gap-2">
+      <button title="تعديل" className="text-blue-600 hover:text-blue-800" onClick={() => setEditMode(true)}>
+        <Edit className="w-4 h-4" />
+      </button>
+      <button title="حذف" className="text-red-600 hover:text-red-800" onClick={() => setShowConfirm(true)}>
+        <Trash2 className="w-4 h-4" />
+      </button>
+      {/* نافذة تأكيد الحذف */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-xl shadow-lg p-6 min-w-[300px]">
+            <p className="mb-4">هل أنت متأكد من حذف هذه الفينيت؟</p>
+            {editError && <div className="text-red-600 text-xs mb-2">{editError}</div>}
+            <div className="flex gap-2 justify-end">
+              <button className="btn" onClick={() => setShowConfirm(false)}>إلغاء</button>
+              <button className="btn bg-red-600 text-white" onClick={handleDelete}>حذف</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* نافذة تعديل مبسطة */}
+      {editMode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-xl shadow-lg p-6 min-w-[350px] max-w-[90vw]">
+            <h3 className="font-bold mb-2">تعديل الفينيت</h3>
+            {editError && <div className="text-red-600 text-xs mb-2">{editError}</div>}
+            <input className="input mb-2" value={editForm.reference} onChange={e => setEditForm({ ...editForm, reference: e.target.value })} />
+            {/* أضف المزيد من الحقول حسب الحاجة */}
+            <div className="flex gap-2 justify-end mt-2">
+              <button className="btn" onClick={() => setEditMode(false)}>إلغاء</button>
+              <button className="btn bg-blue-600 text-white" onClick={handleEdit}>حفظ</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function IconLabel({ icon: Icon, color, children }: { icon: React.ElementType; color: string; children: React.ReactNode }) {
   return (

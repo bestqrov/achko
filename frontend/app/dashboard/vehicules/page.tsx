@@ -57,6 +57,9 @@ const STATUS_STYLE: Record<string, string> = {
 };
 
 /* ── columns ─────────────────────────────────────────── */
+import { Edit, Trash2 } from 'lucide-react';
+import { useDeleteResource, useUpdateResource } from '@/hooks/useResource';
+
 const COLS = [
   { key: 'designation',  label: 'Désignation' },
   { key: 'immatricule',  label: 'Immatricule', render: (v: any, row: any) => v || row.matricule || '—' },
@@ -69,6 +72,10 @@ const COLS = [
     render: (v: any) => v
       ? <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_STYLE[v] ?? 'bg-gray-100 text-gray-600'}`}>{v}</span>
       : '—',
+  },
+  {
+    key: 'actions', label: 'إجراءات',
+    render: (_: any, row: any) => <ActionsCell row={row} />,
   },
 ];
 
@@ -87,6 +94,79 @@ const EMPTY = {
 /* ════════════════════════════════════════════════════════
    Page
 ════════════════════════════════════════════════════════ */
+
+function ActionsCell({ row }: { row: any }) {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const deleteVehicle = useDeleteResource('vehicles');
+  const { refetch } = useResource<any>('vehicles');
+  const [editMode, setEditMode] = useState(false);
+  const [editError, setEditError] = useState('');
+  const updateVehicle = useUpdateResource('vehicles');
+  const [editForm, setEditForm] = useState(row);
+
+  const handleDelete = async () => {
+    setEditError('');
+    try {
+      await deleteVehicle.mutateAsync(row._id);
+      setShowConfirm(false);
+      refetch();
+    } catch (e: any) {
+      setEditError('فشل الحذف');
+    }
+  };
+
+  const handleEdit = async () => {
+    setEditError('');
+    try {
+      await updateVehicle.mutateAsync({ id: row._id, body: editForm });
+      setEditMode(false);
+      refetch();
+    } catch (e: any) {
+      setEditError('فشل التعديل');
+    }
+  };
+
+  return (
+    <div className="flex gap-2">
+      <button title="تعديل" className="text-blue-600 hover:text-blue-800" onClick={() => setEditMode(true)}>
+        <Edit className="w-4 h-4" />
+      </button>
+      <button title="حذف" className="text-red-600 hover:text-red-800" onClick={() => setShowConfirm(true)}>
+        <Trash2 className="w-4 h-4" />
+      </button>
+      {/* نافذة تأكيد الحذف */}
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-xl shadow-lg p-6 min-w-[300px]">
+            <p className="mb-4">هل أنت متأكد من حذف هذا المركبة؟</p>
+            {editError && <div className="text-red-600 text-xs mb-2">{editError}</div>}
+            <div className="flex gap-2 justify-end">
+              <button className="btn" onClick={() => setShowConfirm(false)}>إلغاء</button>
+              <button className="btn bg-red-600 text-white" onClick={handleDelete}>حذف</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* نافذة تعديل مبسطة */}
+      {editMode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+          <div className="bg-white rounded-xl shadow-lg p-6 min-w-[350px] max-w-[90vw]">
+            <h3 className="font-bold mb-2">تعديل المركبة</h3>
+            {editError && <div className="text-red-600 text-xs mb-2">{editError}</div>}
+            <input className="input mb-2" value={editForm.designation} onChange={e => setEditForm({ ...editForm, designation: e.target.value })} />
+            <input className="input mb-2" value={editForm.immatricule} onChange={e => setEditForm({ ...editForm, immatricule: e.target.value })} />
+            {/* أضف المزيد من الحقول حسب الحاجة */}
+            <div className="flex gap-2 justify-end mt-2">
+              <button className="btn" onClick={() => setEditMode(false)}>إلغاء</button>
+              <button className="btn bg-blue-600 text-white" onClick={handleEdit}>حفظ</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function VehiculesPage() {
   const [view, setView]     = useState<'list' | 'form'>('list');
   const [page, setPage]     = useState(1);
@@ -99,61 +179,7 @@ export default function VehiculesPage() {
   const { data, isLoading, refetch, isFetching } = useResource<any>('vehicles', params);
   const create = useCreateResource('vehicles');
 
-  // Handle mutation states
-  useEffect(() => {
-    if (create.isSuccess) {
-      setSuccess('Véhicule créé avec succès !');
-      resetForm();
-      setView('list');
-      create.reset();
-    }
-    if (create.isError) {
-      let message = 'Erreur lors de la création du véhicule';
-      const err = create.error;
-      if (err && typeof err === 'object' && 'isAxiosError' in err && (err as AxiosError).isAxiosError) {
-        message = ((err as AxiosError).response?.data as any)?.message || err.message || message;
-      } else if (err && typeof err === 'object' && 'message' in err) {
-        message = (err as any).message || message;
-      }
-      setError(message);
-      create.reset();
-    }
-  }, [create.isSuccess, create.isError, create.error]);
-
-  const rows: any[] = data?.data ?? [];
-
-  const set = (f: string, v: string) => setForm(p => ({ ...p, [f]: v }));
-  const resetForm = () => setForm(EMPTY);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setSuccess('');
-    setFieldErrors({});
-
-    // simple client-side validation
-    const errs: Record<string,string> = {};
-    if (!form.designation.trim()) errs.designation = 'La désignation est requise';
-    if (!form.immatricule.trim()) errs.immatricule = 'L\'immatricule est requise';
-    // add more rules as needed
-    if (Object.keys(errs).length) {
-      setFieldErrors(errs);
-      return;
-    }
-
-    create.mutate({
-      ...form,
-      kilometrageInitial:   form.kilometrageInitial   ? Number(form.kilometrageInitial)   : 0,
-      indexeHoraireInitial: form.indexeHoraireInitial ? Number(form.indexeHoraireInitial) : 0,
-      montantHT: form.montantHT ? Number(form.montantHT) : 0,
-      tva:       form.tva       ? Number(form.tva)       : 20,
-      matricule:     form.immatricule,
-      model:         form.modele,
-      color:         form.couleur,
-      chassisNumber: form.numeroChassis,
-    });
-    refetch(); // تحديث القائمة بعد الإضافة
-  };
+  // ...existing code...
 
   return (
     <div className="space-y-6">
