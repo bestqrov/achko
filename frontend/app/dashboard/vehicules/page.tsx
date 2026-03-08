@@ -168,12 +168,16 @@ function ActionsCell({ row }: { row: any }) {
 }
 
 export default function VehiculesPage() {
+
   const [view, setView]     = useState<'list' | 'form'>('list');
   const [page, setPage]     = useState(1);
   const [form, setForm]     = useState(EMPTY);
   const [error, setError]   = useState('');
   const [success, setSuccess] = useState('');
   const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
+
+  // إصلاح: تعريف دالة resetForm
+  const resetForm = () => setForm(EMPTY);
 
   const params = useMemo(() => ({ page }), [page]);
   const { data, isLoading, refetch, isFetching } = useResource<any>('vehicles', params);
