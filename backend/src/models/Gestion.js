@@ -1,0 +1,59 @@
+const mongoose = require('mongoose');
+
+const GestionSchema = new mongoose.Schema(
+  {
+    agencyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Agency', required: true },
+    type: { type: String, enum: ['contrat', 'salaire', 'carte', 'collaborateur', 'absence', 'conge', 'formation', 'visite_medicale', 'visa', 'passeport'], required: true },
+    // Contrat
+    employe: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    typeContrat: { type: String, enum: ['CDI', 'CDD', 'interim', 'stage'] },
+    dateDebut: { type: Date },
+    dateFin: { type: Date },
+    poste: { type: String },
+    salaireBrut: { type: Number },
+    salaireNet: { type: Number },
+    // Salaire
+    mois: { type: Number, min: 1, max: 12 },
+    annee: { type: Number },
+    primes: [{ libelle: String, montant: Number }],
+    deductions: [{ libelle: String, montant: Number }],
+    statut: { type: String, enum: ['actif', 'terminé', 'suspendu', 'payé', 'en_attente'], default: 'actif' },
+    document: { type: String },
+    notes: { type: String },
+    // Extended contrat fields
+    numero:             { type: String },
+    collaborateur:      { type: String },
+    dateEntree:         { type: Date },
+    dateEmbauche:       { type: Date },
+    dateFinPrevue:      { type: Date },
+    dureePrevueMois:    { type: Number, default: 0 },
+    dateFinReelle:      { type: Date },
+    dureeReelleMois:    { type: Number, default: 0 },
+    periodeEssaiMois:   { type: Number, default: 0 },
+    nombreHeuresTravail:{ type: Number, default: 0 },
+    attachement:        { type: String },
+    commentaire:        { type: String },
+    // Extended salaire fields
+    prime:              { type: Number, default: 0 },
+    indemnitéTransport: { type: Number, default: 0 },
+    primeAnciennete:    { type: Number, default: 0 },
+    attachement:        { type: String },
+    // Carte fields
+    nom:              { type: String },
+    soldeInitial:     { type: Number, default: 0 },
+    plafondCarburant: { type: Number },
+    plafondService:   { type: Number },
+    tagJawaz:         { type: String },
+    quota:            { type: String },
+    codePin:          { type: String },
+    flotte:           { type: String },
+    fournisseur:      { type: String },
+    activite:         { type: String },
+    typeCarte:        { type: String },
+    typeAffectation:  { type: String },
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  },
+  { timestamps: true }
+);
+
+module.exports = mongoose.model('Gestion', GestionSchema);
