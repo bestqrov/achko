@@ -55,6 +55,7 @@ export default function PlanningPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [form, setForm] = useState(EMPTY_FORM);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
   const { data, isLoading } = useResource<any>('planning', { page, search });
   const { data: vehiclesData } = useResource<any>('vehicles', { limit: 200 });
@@ -72,6 +73,15 @@ export default function PlanningPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setFieldErrors({});
+    const errs: Record<string,string> = {};
+    if (!form.titre.trim()) errs.titre = 'Le titre est requis';
+    if (!form.dateDebut) errs.dateDebut = 'Date début requise';
+    if (!form.dateFin) errs.dateFin = 'Date fin requise';
+    if (Object.keys(errs).length) {
+      setFieldErrors(errs);
+      return;
+    }
     await create.mutateAsync({
       ...form,
       coutEstime: form.coutEstime ? Number(form.coutEstime) : 0,
@@ -184,11 +194,12 @@ export default function PlanningPage() {
             <p className="text-xs font-semibold text-blue-700 uppercase tracking-wider">Informations générales</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <IconLabel icon={Tag} color="#3b82f6">Titre</IconLabel>
-                <input type="text" name="titre" value={form.titre} onChange={handleChange} required
-                  placeholder="Titre de l'événement" className="input" />
-              </div>
+              <ValidatedInput
+                icon={Tag} label="Titre" required
+                name="titre" value={form.titre} onChange={handleChange}
+                placeholder="Titre de l'événement" className="input"
+                error={fieldErrors.titre}
+              />
               <div>
                 <IconLabel icon={Tag} color="#7c3aed">Type</IconLabel>
                 <select name="type" value={form.type} onChange={handleChange} required className="input">
@@ -216,12 +227,18 @@ export default function PlanningPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <IconLabel icon={Calendar} color="#059669">Date début</IconLabel>
-                <input type="date" name="dateDebut" value={form.dateDebut} onChange={handleChange} required className="input" />
+                <ValidatedInput
+                  icon={Calendar} label="Date début" required
+                  type="date" name="dateDebut" value={form.dateDebut} onChange={handleChange} className="input"
+                  error={fieldErrors.dateDebut}
+                />
               </div>
               <div>
-                <IconLabel icon={Calendar} color="#dc2626">Date fin</IconLabel>
-                <input type="date" name="dateFin" value={form.dateFin} onChange={handleChange} required className="input" />
+                <ValidatedInput
+                  icon={Calendar} label="Date fin" required
+                  type="date" name="dateFin" value={form.dateFin} onChange={handleChange} className="input"
+                  error={fieldErrors.dateFin}
+                />
               </div>
             </div>
 
