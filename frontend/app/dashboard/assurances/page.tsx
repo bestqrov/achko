@@ -136,23 +136,8 @@ function IconLabel({ icon: Icon, color, children }: { icon: React.ElementType; c
   );
 }
 
+
 export default function AssurancesPage() {
-    // Données fictives pour le formulaire assurance
-    const MOCKDATA = {
-      reference: 'ASSUR-2026-01',
-      vehicle: vehiclesData?.data?.[0]?._id || '',
-      dateAssurance: '2026-03-01',
-      typeAssurance: 'Responsabilité civile',
-      dateEmission: '2026-03-01',
-      numeroAttestation: 'AT-2026-01',
-      dateExpiration: '2027-03-01',
-      numeroPolice: 'POL-2026-01',
-      organisme: 'AXA Maroc',
-      intermediaire: 'Courtier Pro',
-      fraisTimbre: '50',
-      fraisContrat: '100',
-      notes: 'Assurance annuelle obligatoire',
-    };
   const [page, setPage]               = useState(1);
   const [search, setSearch]           = useState('');
   const [modalOpen, setModalOpen]     = useState(false);
@@ -163,6 +148,23 @@ export default function AssurancesPage() {
   const { data, isLoading }    = useResource<any>('administratif', { page, search, type: 'assurance' });
   const { data: vehiclesData } = useResource<any>('vehicles', { limit: 200 });
   const create                 = useCreateResource('administratif');
+
+  // Données fictives pour le formulaire assurance
+  const MOCKDATA = {
+    reference: 'ASSUR-2026-01',
+    vehicle: vehiclesData?.data?.[0]?._id || '',
+    dateAssurance: '2026-03-01',
+    typeAssurance: 'Responsabilité civile',
+    dateEmission: '2026-03-01',
+    numeroAttestation: 'AT-2026-01',
+    dateExpiration: '2027-03-01',
+    numeroPolice: 'POL-2026-01',
+    organisme: 'AXA Maroc',
+    intermediaire: 'Courtier Pro',
+    fraisTimbre: '50',
+    fraisContrat: '100',
+    notes: 'Assurance annuelle obligatoire',
+  };
 
   // Auto-calculate duration in days
   const dureeJours = useMemo(() => {
