@@ -51,6 +51,15 @@ function IconLabel({ icon: Icon, color, children }: { icon: React.ElementType; c
 }
 
 export default function TaxesPage() {
+    // Données fictives pour le formulaire taxe
+    const MOCKDATA = {
+      reference: 'TAX-2026-01',
+      vehicle: vehiclesData?.data?.[0]?._id || '',
+      montant: '1200',
+      dateEmission: '2026-03-01',
+      dateExpiration: '2027-03-01',
+      notes: 'Taxe annuelle sur véhicule',
+    };
   const [page, setPage]               = useState(1);
   const [search, setSearch]           = useState('');
   const [modalOpen, setModalOpen]     = useState(false);
@@ -83,6 +92,16 @@ export default function TaxesPage() {
 
   return (
     <div className="space-y-6">
+      {/* Remplir automatiquement le formulaire avec des données fictives */}
+      {modalOpen && (
+        <button
+          type="button"
+          className="mb-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs font-semibold"
+          onClick={() => setForm(MOCKDATA)}
+        >
+          Remplir avec des données fictives
+        </button>
+      )}
       {/* Page header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>

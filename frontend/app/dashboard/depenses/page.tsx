@@ -116,6 +116,25 @@ const makeEmpty = () => ({
 
 /* ── page ──────────────────────────────────────────────────── */
 export default function DepensesPage() {
+    // Données fictives pour le formulaire dépense
+    const MOCKDATA = {
+      vehicule: 'Peugeot 208',
+      collaborateur: 'Jean Dupont',
+      numero: 'DEP-2026-01',
+      date: '2026-03-09T10:00',
+      typePaiement: 'Carte bancaire',
+      numeroUtilisation: 'UTIL-2026-01',
+      typeDep: 'Carburant',
+      numeroImputation: 'IMP-2026-01',
+      unite: 'Litre',
+      quantite: '40',
+      montantHT: '800',
+      direction: 'Direction Générale',
+      tva: '20',
+      departement: 'Exploitation',
+      commentaire: 'Dépense carburant mensuelle',
+      attachement: '',
+    };
   const [view, setView]     = useState<'list' | 'form'>('list');
   const [page, setPage]     = useState(1);
   const [search, setSearch] = useState('');
@@ -156,6 +175,16 @@ export default function DepensesPage() {
   if (view === 'list') {
     return (
       <div className="space-y-6">
+        {/* Remplir automatiquement le formulaire avec des données fictives */}
+        {view === 'form' && (
+          <button
+            type="button"
+            className="mb-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs font-semibold"
+            onClick={() => setForm(MOCKDATA)}
+          >
+            Remplir avec des données fictives
+          </button>
+        )}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Dépenses</h2>

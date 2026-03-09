@@ -155,6 +155,20 @@ function AmountField({
 }
 
 export default function VignettesPage() {
+    // Données fictives pour le formulaire vignette
+    const MOCKDATA = {
+      reference: 'VIGN-2026-01',
+      vehicle: vehiclesData?.data?.[0]?._id || '',
+      dateEmission: '2026-01-01',
+      dateExpiration: '2027-01-01',
+      montantPrincipal: '500',
+      penalite: '0',
+      majoration: '0',
+      fraisService: '50',
+      timbre: '20',
+      tvaFraisService: '10',
+      notes: 'Vignette annuelle pour véhicule de société',
+    };
   const [page, setPage]               = useState(1);
   const [search, setSearch]           = useState('');
   const [modalOpen, setModalOpen]     = useState(false);
@@ -202,6 +216,16 @@ export default function VignettesPage() {
 
   return (
     <div className="space-y-6">
+      {/* Remplir automatiquement le formulaire avec des données fictives */}
+      {modalOpen && (
+        <button
+          type="button"
+          className="mb-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs font-semibold"
+          onClick={() => setForm(MOCKDATA)}
+        >
+          Remplir avec des données fictives
+        </button>
+      )}
       {/* Page header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>

@@ -79,6 +79,20 @@ function AmountField({
 }
 
 export default function VisitesTechniquesPage() {
+    // Données fictives pour le formulaire visite technique
+    const MOCKDATA = {
+      vehicle: vehiclesData?.data?.[0]?._id || '',
+      dateEmission: '2026-02-01',
+      dateExpiration: '2027-02-01',
+      typeVisite: 'Périodique',
+      centreVisite: 'Centre Casablanca',
+      tva: '20',
+      timbres: '15',
+      cnpac: '10',
+      taxeCom: '5',
+      cneh: '3',
+      notes: 'Visite technique annuelle',
+    };
   const [page, setPage]               = useState(1);
   const [search, setSearch]           = useState('');
   const [modalOpen, setModalOpen]     = useState(false);
@@ -121,6 +135,16 @@ export default function VisitesTechniquesPage() {
 
   return (
     <div className="space-y-6">
+      {/* Remplir automatiquement le formulaire avec des données fictives */}
+      {modalOpen && (
+        <button
+          type="button"
+          className="mb-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs font-semibold"
+          onClick={() => setForm(MOCKDATA)}
+        >
+          Remplir avec des données fictives
+        </button>
+      )}
       {/* Page header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>

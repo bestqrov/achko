@@ -90,6 +90,20 @@ const makeEmpty = () => ({
 
 /* ── page ──────────────────────────────────────────────────── */
 export default function AutoroutesPage() {
+    // Données fictives pour le formulaire autoroute
+    const MOCKDATA = {
+      vehicule: 'Peugeot 208',
+      collaborateur: 'Jean Dupont',
+      designation: 'Trajet Casablanca-Rabat',
+      numero: 'AUT-2026-01',
+      date: '2026-03-09T09:00',
+      peageDepart: 'Casablanca',
+      peageArrivee: 'Rabat',
+      typePaiement: 'Badge',
+      attachement: '',
+      montantHT: '120',
+      tva: '20',
+    };
   const [view, setView]     = useState<'list' | 'form'>('list');
   const [page, setPage]     = useState(1);
   const [search, setSearch] = useState('');
@@ -137,6 +151,16 @@ export default function AutoroutesPage() {
   if (view === 'list') {
     return (
       <div className="space-y-6">
+        {/* Remplir automatiquement le formulaire avec des données fictives */}
+        {view === 'form' && (
+          <button
+            type="button"
+            className="mb-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs font-semibold"
+            onClick={() => setForm(MOCKDATA)}
+          >
+            Remplir avec des données fictives
+          </button>
+        )}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Autoroutes</h2>

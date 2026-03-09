@@ -168,6 +168,35 @@ function ActionsCell({ row }: { row: any }) {
 }
 
 export default function VehiculesPage() {
+      // Données fictives pour le formulaire (mockdata)
+      const MOCKDATA = {
+        designation: 'Peugeot 208',
+        immatricule: 'AB-123-CD',
+        typeAcquisition: 'Achat',
+        nom: 'Société de Transport',
+        dateMiseEnCirculation: '2023-01-15',
+        code: 'VHC-001',
+        centreCout: 'Centre Paris',
+        numeroOrdre: 'ORD-2024-01',
+        carteGrise: 'CG-2024-01',
+        numeroChassis: 'VF3CC8HP0DT123456',
+        numeroW: 'W-123456',
+        couleur: 'Bleu',
+        codeCle: 'CK-2024',
+        datePrevueRestitution: '2026-01-15',
+        kilometrageInitial: '15000',
+        indexeHoraireInitial: '120',
+        photoUrl: '',
+        commentaire: 'Véhicule en bon état',
+        modele: '208 Allure',
+        concessionnaire: 'Peugeot France',
+        dateAchat: '2023-01-10',
+        numeroContrat: 'CNTR-2023-01',
+        garantie: '2 ans',
+        montantHT: '15000',
+        tva: '20',
+      };
+
     // دالة مساعدة لتحديث الحقول في النموذج
     const set = (field: string, value: any) => {
       setForm(prev => ({ ...prev, [field]: value }));
@@ -213,6 +242,16 @@ export default function VehiculesPage() {
 
   return (
     <div className="space-y-6">
+      {/* Remplir automatiquement le formulaire avec des données fictives */}
+      {view === 'form' && (
+        <button
+          type="button"
+          className="mb-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs font-semibold"
+          onClick={() => setForm(MOCKDATA)}
+        >
+          Remplir avec des données fictives
+        </button>
+      )}
 
       {/* ── Header ── */}
       <div className="rounded-2xl overflow-hidden shadow-md">
