@@ -168,6 +168,31 @@ function ActionsCell({ row }: { row: any }) {
 }
 
 export default function VehiculesPage() {
+    // دالة مساعدة لتحديث الحقول في النموذج
+    const set = (field: string, value: any) => {
+      setForm(prev => ({ ...prev, [field]: value }));
+    };
+  // دالة إرسال النموذج لإضافة مركبة جديدة
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setFieldErrors({});
+    try {
+      await create.mutateAsync(form);
+      setSuccess('تمت إضافة المركبة بنجاح');
+      resetForm();
+      refetch();
+      setView('list');
+    } catch (err: any) {
+      let message = 'فشل الإضافة';
+      if (err?.response?.data?.errors) {
+        setFieldErrors(err.response.data.errors);
+      }
+      message = (err?.response?.data?.message) || err.message || message;
+      setError(message);
+    }
+  };
 
   const [view, setView]     = useState<'list' | 'form'>('list');
   const [page, setPage]     = useState(1);
@@ -182,9 +207,6 @@ export default function VehiculesPage() {
   const params = useMemo(() => ({ page }), [page]);
   const { data, isLoading, refetch, isFetching } = useResource<any>('vehicles', params);
   const rows: any[] = data?.data ?? [];
-
-  const params = useMemo(() => ({ page }), [page]);
-  const { data, isLoading, refetch, isFetching } = useResource<any>('vehicles', params);
   const create = useCreateResource('vehicles');
 
   // ...existing code...
