@@ -151,16 +151,7 @@ export default function AutoroutesPage() {
   if (view === 'list') {
     return (
       <div className="space-y-6">
-        {/* Remplir automatiquement le formulaire avec des données fictives */}
-        {view === 'form' && (
-          <button
-            type="button"
-            className="mb-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs font-semibold"
-            onClick={() => setForm(MOCKDATA)}
-          >
-            Remplir avec des données fictives
-          </button>
-        )}
+        {/* ...existing code... */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Autoroutes</h2>
@@ -187,6 +178,14 @@ export default function AutoroutesPage() {
   ══════════════════════════════════════════════════════════ */
   return (
     <div className="space-y-5">
+      {/* Remplir automatiquement le formulaire avec des données fictives */}
+      <button
+        type="button"
+        className="mb-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs font-semibold"
+        onClick={() => setForm(MOCKDATA)}
+      >
+        Remplir avec des données fictives
+      </button>
 
       {/* ── Header ── */}
       <div className="rounded-2xl overflow-hidden shadow-lg">
