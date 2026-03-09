@@ -74,8 +74,8 @@ const COLS = [
       : '—',
   },
   {
-    key: 'actions', label: 'إجراءات',
-    render: (_: any, row: any) => <ActionsCell row={row} />,
+    key: 'actions', label: 'procédures',
+    render: (_: any, row: any) => <ActionsCell row={row} />, 
   },
 ];
 
