@@ -49,16 +49,25 @@ function IconLabel({ icon: Icon, color, children }: { icon: React.ElementType; c
 }
 
 export default function CartesGrisesPage() {
-    // Données fictives pour le formulaire carte grise
-    const MOCKDATA = {
-      reference: 'CG-2026-01',
-      vehicle: vehiclesData?.data?.[0]?._id || '',
-      dateEmission: '2026-01-01',
-      dateExpiration: '2028-01-01',
-      notes: 'Carte grise pour véhicule utilitaire',
-    };
   const [page, setPage]               = useState(1);
   const [search, setSearch]           = useState('');
+  const [modalOpen, setModalOpen]     = useState(false);
+  const [form, setForm]               = useState(EMPTY_FORM);
+  const [attachement, setAttachement] = useState<File | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
+
+  const { data, isLoading }    = useResource<any>('administratif', { page, search, type: 'carte-grise' });
+  const { data: vehiclesData } = useResource<any>('vehicles', { limit: 200 });
+  const create                 = useCreateResource('administratif');
+
+  // Données fictives pour le formulaire carte grise
+  const MOCKDATA = {
+    reference: 'CG-2026-01',
+    vehicle: vehiclesData?.data?.[0]?._id || '',
+    dateEmission: '2026-01-01',
+    dateExpiration: '2028-01-01',
+    notes: 'Carte grise pour véhicule utilitaire',
+  };
   const [modalOpen, setModalOpen]     = useState(false);
   const [form, setForm]               = useState(EMPTY_FORM);
   const [attachement, setAttachement] = useState<File | null>(null);
