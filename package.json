@@ -1,0 +1,12 @@
+{
+  "name": "arwapark-root",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "scripts": {
+    "start": "node backend/src/app.js"
+  }
+}
