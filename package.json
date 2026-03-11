@@ -7,6 +7,6 @@
     "frontend"
   ],
   "scripts": {
-    "start": "node backend/src/app.js"
+    "start": "node backend/server.js"
   }
 }
