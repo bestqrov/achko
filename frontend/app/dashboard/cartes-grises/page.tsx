@@ -68,14 +68,7 @@ export default function CartesGrisesPage() {
     dateExpiration: '2028-01-01',
     notes: 'Carte grise pour véhicule utilitaire',
   };
-  const [modalOpen, setModalOpen]     = useState(false);
-  const [form, setForm]               = useState(EMPTY_FORM);
-  const [attachement, setAttachement] = useState<File | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
 
-  const { data, isLoading }    = useResource<any>('administratif', { page, search, type: 'carte-grise' });
-  const { data: vehiclesData } = useResource<any>('vehicles', { limit: 200 });
-  const create                 = useCreateResource('administratif');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
