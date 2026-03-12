@@ -51,15 +51,6 @@ function IconLabel({ icon: Icon, color, children }: { icon: React.ElementType; c
 }
 
 export default function TaxesPage() {
-    // Données fictives pour le formulaire taxe
-    const MOCKDATA = {
-      reference: 'TAX-2026-01',
-      vehicle: vehiclesData?.data?.[0]?._id || '',
-      montant: '1200',
-      dateEmission: '2026-03-01',
-      dateExpiration: '2027-03-01',
-      notes: 'Taxe annuelle sur véhicule',
-    };
   const [page, setPage]               = useState(1);
   const [search, setSearch]           = useState('');
   const [modalOpen, setModalOpen]     = useState(false);
@@ -69,6 +60,17 @@ export default function TaxesPage() {
 
   const { data, isLoading }    = useResource<any>('administratif', { page, search, type: 'taxe' });
   const { data: vehiclesData } = useResource<any>('vehicles', { limit: 200 });
+
+  // Données fictives pour le formulaire taxe
+  const MOCKDATA = {
+    reference: 'TAX-2026-01',
+    vehicle: vehiclesData?.data?.[0]?._id || '',
+    montant: '1200',
+    dateEmission: '2026-03-01',
+    dateExpiration: '2027-03-01',
+    notes: 'Taxe annuelle sur véhicule',
+  };
+
   const create                 = useCreateResource('administratif');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
