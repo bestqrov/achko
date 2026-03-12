@@ -175,16 +175,6 @@ export default function DepensesPage() {
   if (view === 'list') {
     return (
       <div className="space-y-6">
-        {/* Remplir automatiquement le formulaire avec des données fictives */}
-        {view === 'form' && (
-          <button
-            type="button"
-            className="mb-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs font-semibold"
-            onClick={() => setForm(MOCKDATA)}
-          >
-            Remplir avec des données fictives
-          </button>
-        )}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">Dépenses</h2>
@@ -209,6 +199,15 @@ export default function DepensesPage() {
   /* ── FORM ── */
   return (
     <div className="space-y-5 pb-8">
+
+      {/* Remplir automatiquement le formulaire avec des données fictives */}
+      <button
+        type="button"
+        className="mb-2 px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-xs font-semibold"
+        onClick={() => setForm(MOCKDATA)}
+      >
+        Remplir avec des données fictives
+      </button>
 
       {/* ── Banner header ── */}
       <div className="rounded-2xl overflow-hidden shadow-lg">
