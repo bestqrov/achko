@@ -180,14 +180,6 @@ export default function VignettesPage() {
     notes: 'Vignette annuelle pour véhicule de société',
   };
   const create                     = useCreateResource('administratif');
-  const [modalOpen, setModalOpen]     = useState(false);
-  const [form, setForm]               = useState(EMPTY_FORM);
-  const [attachement, setAttachement] = useState<File | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
-
-  const { data, isLoading, refetch }        = useResource<any>('administratif', { page, search, type: 'vignette' });
-  const { data: vehiclesData }     = useResource<any>('vehicles', { limit: 200 });
-  const create                     = useCreateResource('administratif');
 
   const total = useMemo(() =>
     ['montantPrincipal', 'penalite', 'majoration', 'fraisService', 'timbre', 'tvaFraisService']

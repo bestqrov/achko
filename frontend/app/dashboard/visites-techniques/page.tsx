@@ -79,20 +79,6 @@ function AmountField({
 }
 
 export default function VisitesTechniquesPage() {
-    // Données fictives pour le formulaire visite technique
-    const MOCKDATA = {
-      vehicle: vehiclesData?.data?.[0]?._id || '',
-      dateEmission: '2026-02-01',
-      dateExpiration: '2027-02-01',
-      typeVisite: 'Périodique',
-      centreVisite: 'Centre Casablanca',
-      tva: '20',
-      timbres: '15',
-      cnpac: '10',
-      taxeCom: '5',
-      cneh: '3',
-      notes: 'Visite technique annuelle',
-    };
   const [page, setPage]               = useState(1);
   const [search, setSearch]           = useState('');
   const [modalOpen, setModalOpen]     = useState(false);
@@ -102,6 +88,21 @@ export default function VisitesTechniquesPage() {
 
   const { data, isLoading }    = useResource<any>('administratif', { page, search, type: 'visite-technique' });
   const { data: vehiclesData } = useResource<any>('vehicles', { limit: 200 });
+
+  // Données fictives pour le formulaire visite technique
+  const MOCKDATA = {
+    vehicle: vehiclesData?.data?.[0]?._id || '',
+    dateEmission: '2026-02-01',
+    dateExpiration: '2027-02-01',
+    typeVisite: 'Périodique',
+    centreVisite: 'Centre Casablanca',
+    tva: '20',
+    timbres: '15',
+    cnpac: '10',
+    taxeCom: '5',
+    cneh: '3',
+    notes: 'Visite technique annuelle',
+  };
   const create                 = useCreateResource('administratif');
 
   const total = useMemo(() =>
