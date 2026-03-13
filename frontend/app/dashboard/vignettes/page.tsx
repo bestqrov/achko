@@ -155,22 +155,31 @@ function AmountField({
 }
 
 export default function VignettesPage() {
-    // Données fictives pour le formulaire vignette
-    const MOCKDATA = {
-      reference: 'VIGN-2026-01',
-      vehicle: vehiclesData?.data?.[0]?._id || '',
-      dateEmission: '2026-01-01',
-      dateExpiration: '2027-01-01',
-      montantPrincipal: '500',
-      penalite: '0',
-      majoration: '0',
-      fraisService: '50',
-      timbre: '20',
-      tvaFraisService: '10',
-      notes: 'Vignette annuelle pour véhicule de société',
-    };
   const [page, setPage]               = useState(1);
   const [search, setSearch]           = useState('');
+  const [modalOpen, setModalOpen]     = useState(false);
+  const [form, setForm]               = useState(EMPTY_FORM);
+  const [attachement, setAttachement] = useState<File | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string,string>>({});
+
+  const { data, isLoading, refetch }        = useResource<any>('administratif', { page, search, type: 'vignette' });
+  const { data: vehiclesData }     = useResource<any>('vehicles', { limit: 200 });
+
+  // Données fictives pour le formulaire vignette
+  const MOCKDATA = {
+    reference: 'VIGN-2026-01',
+    vehicle: vehiclesData?.data?.[0]?._id || '',
+    dateEmission: '2026-01-01',
+    dateExpiration: '2027-01-01',
+    montantPrincipal: '500',
+    penalite: '0',
+    majoration: '0',
+    fraisService: '50',
+    timbre: '20',
+    tvaFraisService: '10',
+    notes: 'Vignette annuelle pour véhicule de société',
+  };
+  const create                     = useCreateResource('administratif');
   const [modalOpen, setModalOpen]     = useState(false);
   const [form, setForm]               = useState(EMPTY_FORM);
   const [attachement, setAttachement] = useState<File | null>(null);
